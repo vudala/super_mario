@@ -1,6 +1,8 @@
 #include "level.h"
 #include "entity.h"
 #include "utils.h"
+#include "animation.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
@@ -25,14 +27,18 @@ int main()
     ALLEGRO_BITMAP* pipe_top = al_load_bitmap("resources/pipe_top.png");
     must_init(pipe_top, "pipe_top");
 
-    struct tile** tiles = load_level("level.txt", NULL);
+    struct tile** tiles = load_level("level.txt");
 
-    ALLEGRO_BITMAP** animation = newAnimation("resources/sprites/mario_idle.png", "resources/sprites/mario_walk1.png",
-    "resources/sprites/mario_walk2.png", "resources/sprites/mario_jump.png");
-    
-    struct entity* character = newEntity(120, 510, 0, 0, RIGHT,
-    al_get_bitmap_width(animation[0]), al_get_bitmap_height(animation[0]),
-    JUMPING, animation);
+    ALLEGRO_BITMAP** tileSprites = loadTileSprites();
+
+    ALLEGRO_BITMAP** frames = malloc(sizeof(ALLEGRO_BITMAP*) * 4);
+    frames[0] = al_load_bitmap("resources/sprites/mario_walk1.png");
+    frames[1] = al_load_bitmap("resources/sprites/mario_idle.png");
+    frames[2] = al_load_bitmap("resources/sprites/mario_walk2.png");
+    frames[3] = al_load_bitmap("resources/sprites/mario_jump.png");
+
+    struct animation* anim = newAnimation(frames, 2, FRAME_DURATION);
+    struct entity* character = newEntity(120, 510, RIGHT, JUMPING, anim);
 
     int offset = 0;
 
@@ -80,47 +86,9 @@ int main()
         if(redraw && al_is_event_queue_empty(queue))
         {
             al_clear_to_color(al_map_rgb(120, 60, 180));
-            char* aux = calloc(50,1);
-            sprintf(aux, "X: %d", character->x);
-            al_draw_text(font, al_map_rgb(255, 0, 0), 20, 20, 0, aux);
-            sprintf(aux, "Y: %d", character->y);
-            al_draw_text(font, al_map_rgb(255, 0, 0), 20, 30, 0, aux);
 
             drawEntity(character, offset);
-            
-            for(int y = 0; y < MAP_HEIGHT; y++){
-                for(int x = 0; x < MAP_WIDTH; x++){
-                    if(tiles[y][x].active){
-                        switch(tiles[y][x].type){
-                            case BRICK_BLOCK:
-                                al_draw_bitmap(brick,
-                                tiles[y][x].x + offset,
-                                tiles[y][x].y,
-                                0);
-                                break;
-                            case PIPE_BLOCK:
-                                al_draw_bitmap(pipe,
-                                tiles[y][x].x + offset,
-                                tiles[y][x].y,
-                                0);
-                                break;  
-                            case PIPE_TOP_BLOCK:
-                                al_draw_bitmap(pipe_top,
-                                tiles[y][x].x + offset,
-                                tiles[y][x].y,
-                                0);
-                                break;
-                            default:
-                                al_draw_bitmap(surprise,
-                                tiles[y][x].x + offset,
-                                tiles[y][x].y,
-                                0);
-                                break;
-                        }
-                    }
-                        
-                }
-            }
+            drawTiles(tiles, tileSprites, &offset);
 
             al_flip_display();
             redraw = false;

@@ -3,6 +3,7 @@
 
 struct tile;
 #include "game.h"
+#include "animation.h"
 
 #define IDLE 0
 #define WALKING 1
@@ -29,14 +30,11 @@ struct entity {
     int w; // Largura
     int h; // Altura
     int behavior; // Atual comportamento da entidade
-    ALLEGRO_BITMAP** animation;  // [0] idle [1] walk1 [2] walk2 [3] jump
+    struct animation* anim; // Animação
 };
 
-// Cria um conjunto de animções baseados em arquivos providos
-ALLEGRO_BITMAP** newAnimation(char* idlePath, char* walk1Path, char* walk2Path, char* jumpPath);
-
 // Cria uma nova entidade
-struct entity* newEntity(int x, int y, int dx, int dy, int dir, int w, int h, int behavior, ALLEGRO_BITMAP** animation);
+struct entity* newEntity(int x, int y, int dir, int behavior, struct animation* anim);
 
 // Checa se há colisão acima da entidade
 int checkUpCollision(struct entity* en, struct tile** tiles);
