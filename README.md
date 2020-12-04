@@ -22,3 +22,5 @@ s - Star Block
 m - Mushroom Block
 
 f - Flower Block
+
+I do not own any of the images used in this project.
