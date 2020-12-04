@@ -21,7 +21,7 @@ struct tile* newTile(int x, int y, int w, int h, int active, int type){
     return t;
 }
 
-struct tile** load_level(char* levelPath, struct tile** tiles, struct entity* enemies){
+struct tile** load_level(char* levelPath, struct tile** tiles){
     FILE* file = fopen(levelPath, "r");
     mustAllocate(file, levelPath);
     struct tile** t = (struct tile**) allocateMatrix(sizeof(struct tile), MAP_WIDTH, MAP_HEIGHT);

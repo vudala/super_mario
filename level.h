@@ -25,6 +25,6 @@ struct tile {
     int highlight;
 };
 
-struct tile** load_level(char* levelPath, struct tile** tiles, struct entity* enemies);
+struct tile** load_level(char* levelPath, struct tile** tiles);
 
 #endif
