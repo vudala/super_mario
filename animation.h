@@ -22,6 +22,8 @@ struct ALLEGRO_BITMAP** loadTileSprites();
 
 ALLEGRO_BITMAP** loadMainFrames();
 
+ALLEGRO_BITMAP** loadGoombaFrames();
+
 // Cria um conjunto de animções baseados em arquivos providos
 struct animation* newAnimation(ALLEGRO_BITMAP** frames, int lFrame, int fDuration);
 

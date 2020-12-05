@@ -42,6 +42,67 @@ struct tile* pointToTile(int x, int y, struct tile** tiles){
     return &tiles[i][j];
 }
 
+
+
+int tileLeftCollision(struct entity* en, struct tile** tiles){
+    if(en->dx < 0){
+        struct tile* left1 = pointToTile(en->x-1, en->y, tiles);
+        struct tile* left2 = pointToTile(en->x-1, en->y+en->h - 1, tiles);
+        if(!left1 || !left2) return 0; // Se for outbounds
+        if(left1->active || left2->active){
+            en->dx = 0;
+            en->x = left1->x+left1->w;
+            if(en->behavior != JUMPING) en->behavior = IDLE;
+            return 1;
+        }
+    }
+    return 0;
+}
+
+int tileRightCollision(struct entity* en, struct tile** tiles){
+    if(en->dx > 0){
+        struct tile* right1 = pointToTile(en->x+en->w, en->y, tiles);
+        struct tile* right2 = pointToTile(en->x+en->w, en->y+en->h - 1, tiles);
+        if(!right1 || !right2) return 0; // Se for outbounds
+        if(right1->active || right2->active){
+            en->dx = 0;
+            en->x = right1->x - right1->w;
+            if(en->behavior != JUMPING) en->behavior = IDLE;
+            return 1;
+        }
+    }
+    return 0;
+}
+
+int tileUpCollision(struct entity* en, struct tile** tiles){
+    struct tile* up1 = pointToTile(en->x + 5, en->y, tiles);
+    struct tile* up2 = pointToTile(en->x+en->w - 5, en->y, tiles);
+    if(!up1 || !up2) return 0; // Se for outbounds
+    if(up1->active || up2->active){
+        en->dy = 0;
+        en->y = up1->y + up1->h;
+        return 1;
+    }
+    
+    return 0;
+}
+
+int tileDownCollision(struct entity* en, struct tile** tiles){
+    struct tile* down1 = pointToTile(en->x + 5, en->y+en->h, tiles);
+    struct tile* down2 = pointToTile(en->x+en->w - 5, en->y+en->h, tiles);
+    if(!down1 || !down2) return 0; // Se for outbounds
+    if(down1->active || down2->active){
+        if(en->behavior == JUMPING){
+            en->behavior = IDLE;
+            en->dy = 0;
+            en->y = down1->y - en->h;
+        }
+        return 1;
+    }
+    
+    return 0;
+}
+
 struct entity** loadEntities(char* levelPath, int* n){
     FILE* file = fopen(levelPath, "r");
     mustAllocate(file, levelPath);
@@ -61,7 +122,7 @@ struct entity** loadEntities(char* levelPath, int* n){
             case MAIN_CHARACTER: case GOOMBA: case TURTLE:
                 entities[e] = newEntity(j*TILE_WIDTH, i*TILE_HEIGHT
                 , RIGHT, JUMPING, 
-                newAnimation(loadMainFrames(), 2, FRAME_DURATION));
+                newAnimation(loadGoombaFrames(), 2, FRAME_DURATION));
                 e++;
                 break;
         }

@@ -13,7 +13,8 @@ struct tile;
 
 #define JUMP_VELOCITY -15.0;
 #define GRAVITY 0.5
-#define WALKING_SPEED 4.0
+#define PLAYER_WALKING_SPEED 4.0
+#define MONSTER_WALKING_SPEED 2.0
 
 typedef enum {
     MAIN_CHARACTER = 'X',
@@ -36,22 +37,10 @@ struct entity {
 // Cria uma nova entidade
 struct entity* newEntity(int x, int y, int dir, int behavior, struct animation* anim);
 
-// Checa se há colisão acima da entidade
-int checkUpCollision(struct entity* en, struct tile** tiles);
-
-// Checa se há colisão abaixo da entidade
-int checkDownCollision(struct entity* en, struct tile** tiles);
-
-// Checa se há colisão à esquerda da entidade
-int checkLeftCollision(struct entity* en, struct tile** tiles);
-
-// Checa se há colisao à direita da entidade
-int checkRightCollision(struct entity* en, struct tile** tiles);
-
 // Atualiza o estado de uma entidade qualquer
 void updateEntity(struct entity* en, struct tile** tiles);
 
 // Atualiza o estado do personagem principal
-void updateCharacter(struct entity* character, struct tile** tiles, unsigned char* key);
+void updateCharacter(struct entity* character, struct tile** tiles, struct entity** entities, unsigned char* key);
 
 #endif

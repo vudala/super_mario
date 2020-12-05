@@ -31,6 +31,21 @@ ALLEGRO_BITMAP** loadTileSprites(){
     return sprites;
 }
 
+// Carrega as sprites do goomba
+ALLEGRO_BITMAP** loadGoombaFrames(){
+    ALLEGRO_BITMAP** frames = malloc(sizeof(ALLEGRO_BITMAP*) * 4);
+    mustAllocate(frames, "frames");
+    frames[0] = al_load_bitmap("resources/sprites/goomba_walk1.png");
+    mustAllocate(frames[0], "frames");
+    frames[1] = al_load_bitmap("resources/sprites/goomba_idle.png");
+    mustAllocate(frames[1], "frames");
+    frames[2] = al_load_bitmap("resources/sprites/goomba_walk2.png");
+    mustAllocate(frames[2], "frames");
+    frames[3] = al_load_bitmap("resources/sprites/goomba_jump.png");
+    mustAllocate(frames[3], "frames");
+    return frames;
+}
+
 // Carrega as sprites do main character
 ALLEGRO_BITMAP** loadMainFrames(){
     ALLEGRO_BITMAP** frames = malloc(sizeof(ALLEGRO_BITMAP*) * 4);
@@ -104,7 +119,7 @@ void drawEntity(struct entity* en, int* offset){
                 floor(*offset + en->x), floor(en->y),
                 0);
             else
-                al_draw_scaled_bitmap(en->anim->frames[1],
+                al_draw_scaled_bitmap(en->anim->frames[JUMP_FRAME],
                 0, 0,
                 en->w, en->h,
                 floor(*offset + en->x) + en->w, floor(en->y),

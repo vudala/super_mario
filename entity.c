@@ -16,105 +16,44 @@ struct entity* newEntity(int x, int y, int dir, int behavior, struct animation* 
     en->dx = 0;
     en->dy = 0;
     en->dir = dir;
-    en->w = al_get_bitmap_width(anim->frames[0]);
-    en->h = al_get_bitmap_height(anim->frames[0]);
+    en->w = al_get_bitmap_width(anim->frames[0]); // Usa as dimensoes do primeiro frame
+    en->h = al_get_bitmap_height(anim->frames[0]); // Usa as dimensoes do primeiro frame
     en->behavior = behavior;
     en->anim = anim;
 
     return en;
 }
 
-int checkLeftCollision(struct entity* en, struct tile** tiles){
-    if(en->dx < 0){
-        struct tile* left1 = pointToTile(en->x-1, en->y, tiles);
-        struct tile* left2 = pointToTile(en->x-1, en->y+en->h - 1, tiles);
-        if(!left1 || !left2) return 0; // Se for outbounds
-        if(left1->active || left2->active){
-            en->dx = 0;
-            if(en->behavior != JUMPING){
-                en->x = left1->x+left1->w;
-                en->behavior = IDLE;
-            }
-            return 1;
-        }
-    }
-    return 0;
-}
-
-int checkRightCollision(struct entity* en, struct tile** tiles){
-    if(en->dx > 0){
-        struct tile* right1 = pointToTile(en->x+en->w+1, en->y, tiles);
-        struct tile* right2 = pointToTile(en->x+en->w+1, en->y+en->h - 1, tiles);
-        if(!right1 || !right2) return 0; // Se for outbounds
-        if(right1->active || right2->active){
-            en->dx = 0;
-            if(en->behavior != JUMPING){
-                en->x = right1->x - right1->w;
-            } 
-            return 1;
-        }
-    }
-    return 0;
-}
-
-int checkDownCollision(struct entity* en, struct tile** tiles){
-    struct tile* down1 = pointToTile(en->x + 5, en->y+en->h, tiles);
-    struct tile* down2 = pointToTile(en->x+en->w - 5, en->y+en->h, tiles);
-    if(!down1 || !down2) return 0; // Se for outbounds
-    if(down1->active || down2->active){
-        if(en->behavior == JUMPING){
-            en->behavior = IDLE;
-            en->dy = 0;
-            en->y = down1->y - en->h;
-        }
-        return 1;
-    }
-    
-    return 0;
-}
-
-int checkUpCollision(struct entity* en, struct tile** tiles){
-    if(en->dy < 0 ){
-        struct tile* up1 = pointToTile(en->x + 5, en->y, tiles);
-        struct tile* up2 = pointToTile(en->x+en->w - 5, en->y, tiles);
-        if(!up1 || !up2) return 0; // Se for outbounds
-        if(up1->active || up2->active){
-            en->dy = 0;
-            en->y = up1->y + up1->h;
-            return 1;
-        }
-    }
-    return 0;
-}
-
 void updateEntity(struct entity* en, struct tile** tiles){
-    if(en->dir) en->dx = WALKING_SPEED;
-    else en->dx = -WALKING_SPEED;
+    if(en->dir) en->dx = MONSTER_WALKING_SPEED;
+    else en->dx = -MONSTER_WALKING_SPEED;
     
     switch(en->behavior){
         case IDLE: break;
         case JUMPING:
             en->dy += GRAVITY;
-            if(checkDownCollision(en, tiles)) en->behavior = WALKING;
-            checkUpCollision(en, tiles);
+            if(tileDownCollision(en, tiles)) en->behavior = WALKING;
+            tileUpCollision(en, tiles);
             break;
         case WALKING:
-            if(!checkDownCollision(en, tiles)) en->behavior = JUMPING;
+            if(!tileDownCollision(en, tiles)) en->behavior = JUMPING;
             break;
     }
-    if(checkLeftCollision(en, tiles)) {
+    // Se bateu em algo troca de direção e continua andando
+    if(tileLeftCollision(en, tiles)) {
         en->dir = RIGHT;
         en->behavior = WALKING;
     }
-    if(checkRightCollision(en, tiles)){
+    if(tileRightCollision(en, tiles)){
         en->dir = LEFT;
         en->behavior = WALKING;
-    } 
+    }
+
     en->y += en->dy;
     en->x += en->dx;
 }
 
-void updateCharacter(struct entity* character, struct tile** tiles, unsigned char* key){
+void updateCharacter(struct entity* character, struct tile** tiles, struct entity** entities, unsigned char* key){
     switch(character->behavior){
         case IDLE:
             if (key[ALLEGRO_KEY_SPACE]){
@@ -123,37 +62,41 @@ void updateCharacter(struct entity* character, struct tile** tiles, unsigned cha
             } else
             if (key[ALLEGRO_KEY_LEFT]){
                 character->dir = LEFT;
-                character->dx = -WALKING_SPEED;
+                character->dx = -PLAYER_WALKING_SPEED;
                 character->behavior = WALKING;
             } else
             if (key[ALLEGRO_KEY_RIGHT]) {
                 character->dir = RIGHT;
-                character->dx = WALKING_SPEED;
+                character->dx = PLAYER_WALKING_SPEED;
                 character->behavior = WALKING;
             } else
                 character->dx = 0;
 
-            checkLeftCollision(character, tiles);
-            checkRightCollision(character, tiles);
-            checkUpCollision(character, tiles);
+            
+            tileUpCollision(character, tiles);
+            tileLeftCollision(character, tiles);
+            tileRightCollision(character, tiles);
 
             break;
         case JUMPING:
             if(key[ALLEGRO_KEY_LEFT]){
                 character->dir = 0;
-                character->dx = -WALKING_SPEED;
+                character->dx = -PLAYER_WALKING_SPEED;
             } else
             if(key[ALLEGRO_KEY_RIGHT]){
                 character->dir = 1;
-                character->dx = WALKING_SPEED;
+                character->dx = PLAYER_WALKING_SPEED;
             } else character->dx = 0;
             
             character->dy += GRAVITY;
             
-            checkLeftCollision(character, tiles);
-            checkRightCollision(character, tiles);
-            checkDownCollision(character, tiles);
-            checkUpCollision(character, tiles);
+            
+            if(character->dy >= 0){
+                tileDownCollision(character, tiles);
+            } else tileUpCollision(character, tiles);
+            // Se estiver indo a direita
+            if(character->dir) tileRightCollision(character, tiles);
+            else tileLeftCollision(character, tiles);
             
             break;
         case WALKING:
@@ -163,19 +106,20 @@ void updateCharacter(struct entity* character, struct tile** tiles, unsigned cha
             } else
             if (key[ALLEGRO_KEY_LEFT]) {
                 character->dir = LEFT;
-                character->dx = -WALKING_SPEED;
+                character->dx = -PLAYER_WALKING_SPEED;
             } else
             if (key[ALLEGRO_KEY_RIGHT]) {
                 character->dir = RIGHT;
-                character->dx = WALKING_SPEED;
+                character->dx = PLAYER_WALKING_SPEED;
             } else {
                 character->dx = 0;
                 character->behavior = IDLE;
             }
-
-            checkLeftCollision(character, tiles);
-            checkRightCollision(character, tiles);
-            if(!checkDownCollision(character, tiles))  character->behavior = JUMPING;
+            // Se não houver nada embaixo
+            if(!tileDownCollision(character, tiles)) character->behavior = JUMPING;
+            // Se estiver indo a direita
+            if(character->dir) tileRightCollision(character, tiles);
+            else tileLeftCollision(character, tiles);
             
             break;
     }

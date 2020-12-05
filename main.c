@@ -3,15 +3,6 @@
 #include "utils.h"
 #include "animation.h"
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <math.h>
-
-
-#define IDLE 0
-#define WALKING 1
-#define JUMPING 2
-
 int main()
 {
     game_init();
@@ -43,8 +34,7 @@ int main()
         switch(event.type)
         {
             case ALLEGRO_EVENT_TIMER:
-                updateCharacter(character, tiles, key);
-                
+                updateCharacter(character, tiles, entities, key);
                 for(int i = 0; i < entN; i++) updateEntity(entities[i], tiles);
                 
                 offset = -(character->x - (DISPLAY_WIDTH / 2));
@@ -76,9 +66,9 @@ int main()
             drawEntity(character, &offset);
             drawTiles(tiles, tileSprites, &offset);
             for(int i = 0; i < entN; i++) drawEntity(entities[i], &offset);
-            // char* aux = calloc(1, 50);
-            // sprintf(aux, "%d", entities[i]->x);
-            // al_draw_text(font, al_map_rgb(255, 0, 0), 20, i*20, 0, aux);
+            char* aux = calloc(1, 50);
+            sprintf(aux, "%d", character->behavior);
+            al_draw_text(font, al_map_rgb(255, 0, 0), 20, 20, 0, aux);
             
             al_flip_display();
             redraw = false;
