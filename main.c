@@ -7,6 +7,7 @@
 #include <stdlib.h>
 #include <math.h>
 
+
 #define IDLE 0
 #define WALKING 1
 #define JUMPING 2
@@ -14,31 +15,16 @@
 int main()
 {
     game_init();
-    
-    ALLEGRO_BITMAP* brick = al_load_bitmap("resources/brick.png");
-    must_init(brick, "brick");
-
-    ALLEGRO_BITMAP* surprise = al_load_bitmap("resources/surprise.png");
-    must_init(surprise, "surprise");
-
-    ALLEGRO_BITMAP* pipe = al_load_bitmap("resources/pipe.png");
-    must_init(pipe, "pipe");
-
-    ALLEGRO_BITMAP* pipe_top = al_load_bitmap("resources/pipe_top.png");
-    must_init(pipe_top, "pipe_top");
 
     struct tile** tiles = load_level("level.txt");
 
     ALLEGRO_BITMAP** tileSprites = loadTileSprites();
 
-    ALLEGRO_BITMAP** frames = malloc(sizeof(ALLEGRO_BITMAP*) * 4);
-    frames[0] = al_load_bitmap("resources/sprites/mario_walk1.png");
-    frames[1] = al_load_bitmap("resources/sprites/mario_idle.png");
-    frames[2] = al_load_bitmap("resources/sprites/mario_walk2.png");
-    frames[3] = al_load_bitmap("resources/sprites/mario_jump.png");
-
-    struct animation* anim = newAnimation(frames, 2, FRAME_DURATION);
+    struct animation* anim = newAnimation(loadMainFrames(), 2, FRAME_DURATION);
     struct entity* character = newEntity(120, 510, RIGHT, JUMPING, anim);
+
+    int entN = 0;
+    struct entity** entities = loadEntities("level.txt", &entN);
 
     int offset = 0;
 
@@ -58,9 +44,9 @@ int main()
         {
             case ALLEGRO_EVENT_TIMER:
                 updateCharacter(character, tiles, key);
-
-                character->y += character->dy;
-                character->x += character->dx;
+                
+                for(int i = 0; i < entN; i++) updateEntity(entities[i], tiles);
+                
                 offset = -(character->x - (DISPLAY_WIDTH / 2));
                
                 if(key[ALLEGRO_KEY_ESCAPE]) done = true;
@@ -87,9 +73,13 @@ int main()
         {
             al_clear_to_color(al_map_rgb(120, 60, 180));
 
-            drawEntity(character, offset);
+            drawEntity(character, &offset);
             drawTiles(tiles, tileSprites, &offset);
-
+            for(int i = 0; i < entN; i++) drawEntity(entities[i], &offset);
+            // char* aux = calloc(1, 50);
+            // sprintf(aux, "%d", entities[i]->x);
+            // al_draw_text(font, al_map_rgb(255, 0, 0), 20, i*20, 0, aux);
+            
             al_flip_display();
             redraw = false;
         }

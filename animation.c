@@ -5,11 +5,12 @@
 
 #include <math.h>
 
-struct ALLEGRO_BITMAP** loadTileSprites(){
+ALLEGRO_BITMAP** loadTileSprites(){
     ALLEGRO_BITMAP** sprites = calloc(8, sizeof(ALLEGRO_BITMAP*));
     mustAllocate(sprites, "sprites");
 
-    sprites[0] = NULL;
+    sprites[0] = al_load_bitmap("resources/brick.png");
+    mustAllocate(sprites[0],"a");
     sprites[1] = al_load_bitmap("resources/brick.png");
     mustAllocate(sprites[1],"a");
     sprites[2] = al_load_bitmap("resources/brick.png");
@@ -28,6 +29,17 @@ struct ALLEGRO_BITMAP** loadTileSprites(){
     mustAllocate(sprites[8],"a");
 
     return sprites;
+}
+
+// Carrega as sprites do main character
+ALLEGRO_BITMAP** loadMainFrames(){
+    ALLEGRO_BITMAP** frames = malloc(sizeof(ALLEGRO_BITMAP*) * 4);
+    mustAllocate(frames, "frames");
+    frames[0] = al_load_bitmap("resources/sprites/mario_walk1.png");
+    frames[1] = al_load_bitmap("resources/sprites/mario_idle.png");
+    frames[2] = al_load_bitmap("resources/sprites/mario_walk2.png");
+    frames[3] = al_load_bitmap("resources/sprites/mario_jump.png");
+    return frames;
 }
 
 struct animation* newAnimation(ALLEGRO_BITMAP** frames, int lFrame, int fDuration){
@@ -57,45 +69,45 @@ void updateWalkFrame(struct entity* en){
 }
 
 
-void drawEntity(struct entity* en, int offset){
+void drawEntity(struct entity* en, int* offset){
     switch(en->behavior){
         case IDLE:
             if(en->dir)
                 al_draw_bitmap(en->anim->frames[1],
-                floor(offset + en->x), floor(en->y),
+                floor(*offset + en->x), floor(en->y),
                 0);
             else
                 al_draw_scaled_bitmap(en->anim->frames[IDLE_FRAME],
                 0, 0,
                 en->w, en->h,
-                floor(offset + en->x) + en->w, floor(en->y),
+                floor(*offset + en->x) + en->w, floor(en->y),
                 en->w * -1, en->h,
                 0);
             break;
-        case WALKING:;
+        case WALKING:
             updateWalkFrame(en);
             if(en->dir)
                 al_draw_bitmap(en->anim->frames[en->anim->currentFrame],
-                floor(offset + en->x), floor(en->y),
+                floor(*offset + en->x), floor(en->y),
                 0);
             else
                 al_draw_scaled_bitmap(en->anim->frames[en->anim->currentFrame],
                 0, 0,
                 en->w, en->h,
-                floor(offset + en->x) + en->w, floor(en->y),
+                floor(*offset + en->x) + en->w, floor(en->y),
                 en->w * -1, en->h,
                 0);
             break;
         case JUMPING:
             if(en->dir)
                 al_draw_bitmap(en->anim->frames[JUMP_FRAME],
-                floor(offset + en->x), floor(en->y),
+                floor(*offset + en->x), floor(en->y),
                 0);
             else
                 al_draw_scaled_bitmap(en->anim->frames[1],
                 0, 0,
                 en->w, en->h,
-                floor(offset + en->x) + en->w, floor(en->y),
+                floor(*offset + en->x) + en->w, floor(en->y),
                 en->w * -1, en->h,
                 0);
             break;
@@ -103,18 +115,17 @@ void drawEntity(struct entity* en, int offset){
 }
 
 void drawTiles(struct tile** tiles, ALLEGRO_BITMAP** sprites, int* offset){
-    int whichSprite = 0; 
-    
+    int whichSprite = 0;
     for(int y = 0; y < MAP_HEIGHT; y++){
-    for(int x = 0; x < MAP_WIDTH; x++){
-        if(tiles[y][x].active){
-            whichSprite = getTileV(tiles[y][x].type);
-            al_draw_bitmap(sprites[whichSprite],
-            tiles[y][x].x + *offset,
-            tiles[y][x].y,
-            0);
+        for(int x = 0; x < MAP_WIDTH; x++){
+            if(tiles[y][x].active){
+                whichSprite = getTileV(tiles[y][x].type);
+                al_draw_bitmap(sprites[whichSprite],
+                tiles[y][x].x + *offset,
+                tiles[y][x].y,
+                0);
+            }
+                
         }
-            
-    }
     }
 }

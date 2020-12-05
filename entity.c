@@ -36,7 +36,7 @@ int checkLeftCollision(struct entity* en, struct tile** tiles){
                 en->behavior = IDLE;
             }
             return 1;
-        } 
+        }
     }
     return 0;
 }
@@ -50,7 +50,6 @@ int checkRightCollision(struct entity* en, struct tile** tiles){
             en->dx = 0;
             if(en->behavior != JUMPING){
                 en->x = right1->x - right1->w;
-                en->behavior = IDLE;
             } 
             return 1;
         }
@@ -59,7 +58,6 @@ int checkRightCollision(struct entity* en, struct tile** tiles){
 }
 
 int checkDownCollision(struct entity* en, struct tile** tiles){
-    
     struct tile* down1 = pointToTile(en->x + 5, en->y+en->h, tiles);
     struct tile* down2 = pointToTile(en->x+en->w - 5, en->y+en->h, tiles);
     if(!down1 || !down2) return 0; // Se for outbounds
@@ -87,6 +85,33 @@ int checkUpCollision(struct entity* en, struct tile** tiles){
         }
     }
     return 0;
+}
+
+void updateEntity(struct entity* en, struct tile** tiles){
+    if(en->dir) en->dx = WALKING_SPEED;
+    else en->dx = -WALKING_SPEED;
+    
+    switch(en->behavior){
+        case IDLE: break;
+        case JUMPING:
+            en->dy += GRAVITY;
+            if(checkDownCollision(en, tiles)) en->behavior = WALKING;
+            checkUpCollision(en, tiles);
+            break;
+        case WALKING:
+            if(!checkDownCollision(en, tiles)) en->behavior = JUMPING;
+            break;
+    }
+    if(checkLeftCollision(en, tiles)) {
+        en->dir = RIGHT;
+        en->behavior = WALKING;
+    }
+    if(checkRightCollision(en, tiles)){
+        en->dir = LEFT;
+        en->behavior = WALKING;
+    } 
+    en->y += en->dy;
+    en->x += en->dx;
 }
 
 void updateCharacter(struct entity* character, struct tile** tiles, unsigned char* key){

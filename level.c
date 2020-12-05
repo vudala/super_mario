@@ -42,6 +42,37 @@ struct tile* pointToTile(int x, int y, struct tile** tiles){
     return &tiles[i][j];
 }
 
+struct entity** loadEntities(char* levelPath, int* n){
+    FILE* file = fopen(levelPath, "r");
+    mustAllocate(file, levelPath);
+    struct entity** entities = calloc(50, sizeof(struct entity*));
+    mustAllocate(entities, "entities");
+
+    char c;
+    int i = 0, j = 0;
+    int e = 0;
+    while((c = fgetc(file)) != EOF){
+        if(j == MAP_WIDTH){
+            fgetc(file);
+            i++;
+            j = 0;
+        }
+        switch(c){
+            case MAIN_CHARACTER: case GOOMBA: case TURTLE:
+                entities[e] = newEntity(j*TILE_WIDTH, i*TILE_HEIGHT
+                , RIGHT, JUMPING, 
+                newAnimation(loadMainFrames(), 2, FRAME_DURATION));
+                e++;
+                break;
+        }
+        j++;
+    }
+    *n = e;
+    fclose(file);
+
+    return entities;
+}
+
 struct tile** load_level(char* levelPath){
     FILE* file = fopen(levelPath, "r");
     mustAllocate(file, levelPath);
@@ -53,18 +84,17 @@ struct tile** load_level(char* levelPath){
     char c;
     int i = 0, j = 0;
     while((c = fgetc(file)) != EOF){
-        if(j >= MAP_WIDTH){
+        if(j == MAP_WIDTH){
             fgetc(file);
             i++;
             j = 0;
         }
         switch(c){
+            case '\n': break;
             case MAIN_CHARACTER: case GOOMBA: case TURTLE:
-                newT = newTile( j * TILE_WIDTH, i * TILE_HEIGHT, TILE_WIDTH, TILE_HEIGHT, c != EMPTY_BLOCK ? 1 : 0, c);
+                newT = newTile( j * TILE_WIDTH, i * TILE_HEIGHT, TILE_WIDTH, TILE_HEIGHT, 0, EMPTY_BLOCK);
                 t[i][j] = *newT;
                 free(newT);
-                break;
-            case '\n':
                 break;
             default:
                 newT = newTile( j * TILE_WIDTH, i * TILE_HEIGHT, TILE_WIDTH, TILE_HEIGHT, c != EMPTY_BLOCK ? 1 : 0, c);
@@ -72,7 +102,6 @@ struct tile** load_level(char* levelPath){
                 free(newT);
                 break;
         }
-        
         j++;
     }
 

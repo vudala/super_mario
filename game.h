@@ -10,7 +10,7 @@
 #include <allegro5/allegro_image.h>
 #include <allegro5/allegro_primitives.h>
 
-#define MAP_WIDTH 128
+#define MAP_WIDTH 337
 #define MAP_HEIGHT 16
 #define TILE_WIDTH 40
 #define TILE_HEIGHT 40

@@ -20,11 +20,13 @@ struct animation {
 
 struct ALLEGRO_BITMAP** loadTileSprites();
 
+ALLEGRO_BITMAP** loadMainFrames();
+
 // Cria um conjunto de animções baseados em arquivos providos
 struct animation* newAnimation(ALLEGRO_BITMAP** frames, int lFrame, int fDuration);
 
 // Desenha uma entidade qualquer utilizando um deslocamento
-void drawEntity(struct entity* en, int offset);
+void drawEntity(struct entity* en, int* offset);
 
 // Desenha as tiles
 void drawTiles(struct tile** tiles, ALLEGRO_BITMAP** sprites, int* offset);

@@ -11,9 +11,9 @@ struct tile;
 #define LEFT 0
 #define RIGHT 1
 
-#define JUMP_VELOCITY -10.0;
+#define JUMP_VELOCITY -15.0;
 #define GRAVITY 0.5
-#define WALKING_SPEED 2.0
+#define WALKING_SPEED 4.0
 
 typedef enum {
     MAIN_CHARACTER = 'X',
@@ -48,13 +48,10 @@ int checkLeftCollision(struct entity* en, struct tile** tiles);
 // Checa se há colisao à direita da entidade
 int checkRightCollision(struct entity* en, struct tile** tiles);
 
-// Aponta para a tile que se encontra naquele determinado par de coordenadas
-struct tile* pointToTile(int x, int y, struct tile** tiles);
+// Atualiza o estado de uma entidade qualquer
+void updateEntity(struct entity* en, struct tile** tiles);
 
 // Atualiza o estado do personagem principal
 void updateCharacter(struct entity* character, struct tile** tiles, unsigned char* key);
-
-// Desenha uma entidade qualquer utilizando um deslocamento
-void drawEntity(struct entity* en, int offset);
 
 #endif

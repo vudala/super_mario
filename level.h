@@ -43,6 +43,8 @@ struct tile* pointToTile(int x, int y, struct tile** tiles);
 
 struct tile** load_level(char* levelPath);
 
+struct entity** loadEntities(char* levelPath, int* n);
+
 // Converte o valor C para um indice de um sprite
 int getTileV(char c);
 
