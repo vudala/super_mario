@@ -3,6 +3,7 @@
 
 struct entity;
 #include "entity_list.h"
+#include "game.h"
 
 #define TILES_N 9
 typedef enum {
@@ -40,15 +41,14 @@ struct tile {
     int highlight;
 };
 
-struct tile** load_level(char* levelPath, struct entityList* l, int* id);
-
-struct entityList** loadEntities(char* levelPath, int* id);
+// Lê o arquivo de configuração do level, retorna as tiles dele e preenche as entidades
+struct tile** load_level(char* levelPath, struct entityList* l, ALLEGRO_BITMAP*** sprites);
 
 // Aponta para a tile presente naquele par de coordenadas
 struct tile* pointToTile(int x, int y, struct tile** tiles);
 
 // Checa se há colisão acima da entidade
-int tileUpCollision(struct entity* en, struct tile** tiles);
+int tileUpCollision(struct entity* en, struct tile** tiles/*, struct entityList* entities*/);
 
 // Checa se há colisão abaixo da entidade
 int tileDownCollision(struct entity* en, struct tile** tiles);

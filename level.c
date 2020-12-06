@@ -6,6 +6,7 @@
 #include "game.h"
 #include "entity.h"
 #include "entity_list.h"
+#include "animation.h"
 #include <math.h>
 
 struct tile* newTile(int x, int y, int w, int h, int active, int type){
@@ -75,13 +76,22 @@ int tileRightCollision(struct entity* en, struct tile** tiles){
     return 0;
 }
 
-int tileUpCollision(struct entity* en, struct tile** tiles){
+int tileUpCollision(struct entity* en, struct tile** tiles/*, struct entityList* entities*/){
     struct tile* up1 = pointToTile(en->x + 5, en->y, tiles);
     struct tile* up2 = pointToTile(en->x+en->w - 5, en->y, tiles);
     if(!up1 || !up2) return 0; // Se for outbounds
     if(up1->active || up2->active){
         en->dy = 0;
         en->y = up1->y + up1->h;
+        // if(up1->active){
+        //     switch(up1->type){
+        //         case COIN_BLOCK:case STAR_BLOCK:case MUSHROOM_BLOCK:case FLOWER_BLOCK:
+        //             insertEntity(entities, 
+        //             newEntity()
+        //             );
+        //             break;
+        //     }
+        // }
         return 1;
     }
     
@@ -104,44 +114,15 @@ int tileDownCollision(struct entity* en, struct tile** tiles){
     return 0;
 }
 
-// struct entityList* loadEntities(char* levelPath, int* id){
-//     FILE* file = fopen(levelPath, "r");
-//     mustAllocate(file, levelPath);
-//     struct entityList* l = malloc(sizeof(struct entityList));
-//     createList(l);
-
-//     char c;
-//     int i = 0, j = 0;
-//     int e = 0;
-//     while((c = fgetc(file)) != EOF){
-//         if(j == MAP_WIDTH){
-//             fgetc(file);
-//             i++;
-//             j = 0;
-//         }
-//         switch(c){
-//             case MAIN_CHARACTER: case GOOMBA: case TURTLE:
-//                 insertEntity(l,
-//                     newEntity(j*TILE_WIDTH, i*TILE_HEIGHT,RIGHT, JUMPING, 
-//                     newAnimation(loadGoombaFrames(), 2, FRAME_DURATION)),
-//                 id++);
-//                 break;
-//         }
-//         j++;
-//     }
-
-//     fclose(file);
-
-//     return l;
-// }
-
-struct tile** load_level(char* levelPath, struct entityList* l, int* id){
+struct tile** load_level(char* levelPath, struct entityList* l, ALLEGRO_BITMAP*** sprites){
     FILE* file = fopen(levelPath, "r");
     mustAllocate(file, levelPath);
     struct tile** t = (struct tile**) allocateMatrix(sizeof(struct tile), MAP_WIDTH, MAP_HEIGHT);
     mustAllocate(t, "tiles");
 
     struct tile* newT = NULL;
+    int whichSprite = 0;
+    int width, height;
 
     char c;
     int i = 0, j = 0;
@@ -154,10 +135,13 @@ struct tile** load_level(char* levelPath, struct entityList* l, int* id){
         switch(c){
             case '\n': break;
             case MAIN_CHARACTER: case GOOMBA: case TURTLE:
+                whichSprite = typeToSpriteID(c);
+                width = al_get_bitmap_width(sprites[whichSprite][0]);
+                height = al_get_bitmap_height(sprites[whichSprite][0]);
                 insertEntity(l,
-                    newEntity(j*TILE_WIDTH, i*TILE_HEIGHT,RIGHT, JUMPING, 
-                    newAnimation(loadGoombaFrames(), 2, FRAME_DURATION)),
-                id++);
+                    newEntity(j*TILE_WIDTH, i*TILE_HEIGHT, width, height, RIGHT, JUMPING, 
+                        newAnimation(whichSprite, 2, FRAME_DURATION))
+                );
                 newT = newTile( j * TILE_WIDTH, i * TILE_HEIGHT, TILE_WIDTH, TILE_HEIGHT, 0, EMPTY_BLOCK);
                 t[i][j] = *newT;
                 free(newT);

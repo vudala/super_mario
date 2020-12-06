@@ -8,6 +8,9 @@ int main()
 {
     game_init();
 
+    ALLEGRO_BITMAP*** sprites = loadSprites();
+    ALLEGRO_BITMAP** tileSprites = loadTileSprites();
+
     ALLEGRO_SAMPLE* rojao = al_load_sample("resources/rojao.wav");
     must_init(rojao, "rojao");
 
@@ -16,20 +19,17 @@ int main()
     al_set_audio_stream_playmode(soundtrack, ALLEGRO_PLAYMODE_LOOP);
     //al_attach_audio_stream_to_mixer(soundtrack, al_get_default_mixer());
 
-    
-    int id = 0;
     struct entityList* entities = malloc(sizeof(struct entityList));
     must_init(entities, "entities");
     createList(entities);
 
-    struct tile** tiles = load_level("level.txt", entities, &id);
-    ALLEGRO_BITMAP** tileSprites = loadTileSprites();
-
-    // int entN = 0;
-    // struct entity** entities = loadEntities("level.txt", &entN);
+    struct tile** tiles = load_level("level.txt", entities, sprites);
     
-    struct animation* anim = newAnimation(loadMainFrames(), 2, FRAME_DURATION);
-    struct entity* character = newEntity(120, 510, RIGHT, JUMPING, anim);
+    struct animation* anim = newAnimation(MAIN_CHARACTER_SPRITE, 2, FRAME_DURATION);
+    struct entity* character = newEntity(120, 510,
+        al_get_bitmap_width(sprites[MAIN_CHARACTER_SPRITE][0]),
+        al_get_bitmap_height(sprites[MAIN_CHARACTER_SPRITE][0]),
+        RIGHT, JUMPING, anim);
 
     int offset = 0;
 
@@ -49,19 +49,19 @@ int main()
         switch(event.type)
         {
             case ALLEGRO_EVENT_TIMER:
-                updateCharacter(character, tiles, NULL, key);
+                updateCharacter(character, tiles, key);
 
                 struct entityNode* next = entities->start;
                 while(next != NULL){
                     updateEntity(next->en, tiles);
+                    // Se pulou em cima de um inimigo
                     if(entityDownCollision(character, next->en)){
-                        next->en->life -= 1;
+                        removeEntity(next->id, entities);
                         character->dy = -12.5;
                         character->behavior = JUMPING;
                         al_play_sample(rojao, 1.0, 0.0, 1.0, ALLEGRO_PLAYMODE_ONCE, NULL);
-                    } else if(entityCollision(character, next->en)){
+                    } else if(entityCollision(character, next->en)) // Se colidiram com as outras laterais
                         lost = 1;
-                    }
                     next = next->next;
                 }
                 
@@ -91,18 +91,14 @@ int main()
         {
             al_clear_to_color(al_map_rgb(120, 60, 180));
 
-            drawEntity(character, &offset);
+            drawEntity(character, &offset, sprites);
             drawTiles(tiles, tileSprites, &offset);
             //for(int i = 0; i < entN; i++) drawEntity(entities[i], &offset);
             struct entityNode* next = entities->start;
             while(next != NULL){
-                drawEntity(next->en, &offset);
+                drawEntity(next->en, &offset, sprites);
                 next = next->next;
             }
-
-            char* aux = calloc(1, 50);
-            sprintf(aux, "%d", character->behavior);
-            al_draw_text(font, al_map_rgb(255, 0, 0), 20, 20, 0, aux);
             
             al_flip_display();
             redraw = false;

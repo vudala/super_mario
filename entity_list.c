@@ -23,10 +23,10 @@ void destroyList(struct entityList* l){
     l->start = NULL;
 }
 
-int insertEntity(struct entityList* l, struct entity* en, int* id){
+int insertEntity(struct entityList* l, struct entity* en){
     struct entityNode* nodo = malloc(sizeof(struct entityNode));
     if(nodo == NULL) return 0;
-    nodo->id = *id;
+    nodo->id = l->idTrack++;
     nodo->en = en;
     nodo->next = NULL;
 

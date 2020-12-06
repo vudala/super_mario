@@ -21,7 +21,11 @@ struct tile;
 typedef enum {
     MAIN_CHARACTER = 'X',
     GOOMBA = 'g',
-    TURTLE = 't'
+    TURTLE = 't',
+    FLOWER = 'F',
+    STAR = 'S',
+    SHELL = 'D',
+    MUSHROOM = 'M'
 } EntityTipe;
 
 struct entity {
@@ -37,20 +41,13 @@ struct entity {
     struct animation* anim; // Animação
 };
 
-// Lista de entidades
-struct enNode {
-    int id;
-    struct entity* en;
-    struct enNode* next;
-};
-
 // Cria uma nova entidade
-struct entity* newEntity(int x, int y, int dir, int behavior, struct animation* anim);
+struct entity* newEntity(int x, int y, int w, int h, int dir, int behavior, struct animation* anim);
 
-// Checa colisãp entre entidades
+// Checa colisão entre duas entidades
 int entityCollision(struct entity* en1, struct entity* en2);
 
-// Checa colisão com outras entidades nos quatro extremos
+// Checa colisão entre duas entidades, uma para cada extremo
 int entityLeftCollision(struct entity* en1, struct entity* en2);
 int entityRightCollision(struct entity* en1, struct entity* en2);
 int entityDownCollision(struct entity* en1, struct entity* en2);
@@ -60,7 +57,7 @@ int entityUpCollision(struct entity* en1, struct entity* en2);
 void updateEntity(struct entity* en, struct tile** tiles);
 
 // Atualiza o estado do personagem principal
-void updateCharacter(struct entity* character, struct tile** tiles, struct entity** entities, unsigned char* key);
+void updateCharacter(struct entity* character, struct tile** tiles, unsigned char* key);
 
 // Libera o espaço de memória ocupado pela entidade
 void destroyEntity(struct entity* en);

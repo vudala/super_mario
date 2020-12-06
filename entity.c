@@ -7,17 +7,17 @@
 #include <stdio.h>
 #include <math.h>
 
-struct entity* newEntity(int x, int y, int dir, int behavior, struct animation* anim){
+struct entity* newEntity(int x, int y, int w, int h, int dir, int behavior, struct animation* anim){
     struct entity* en = malloc(sizeof(struct entity));
     mustAllocate(en, "entity");
 
     en->x = x;
     en->y = y;
+    en->w = w;
+    en->h = h;
     en->dx = 0;
     en->dy = 0;
     en->dir = dir;
-    en->w = al_get_bitmap_width(anim->frames[0]); // Usa as dimensoes do primeiro frame
-    en->h = al_get_bitmap_height(anim->frames[0]); // Usa as dimensoes do primeiro frame
     en->behavior = behavior;
     en->anim = anim;
     en->life = 1;
@@ -95,8 +95,7 @@ void updateEntity(struct entity* en, struct tile** tiles){
     en->x += en->dx;
 }
 
-void updateCharacter(struct entity* character, struct tile** tiles, struct entity** entities, unsigned char* key){
-    if(entities != NULL) return;
+void updateCharacter(struct entity* character, struct tile** tiles, unsigned char* key){
     switch(character->behavior){
         case IDLE:
             if (key[ALLEGRO_KEY_SPACE]){
