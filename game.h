@@ -8,12 +8,15 @@
 #include <allegro5/allegro_audio.h>
 #include <allegro5/allegro_acodec.h>
 
-#define MAP_WIDTH 337
-#define MAP_HEIGHT 16
-#define TILE_WIDTH 40
-#define TILE_HEIGHT 40
-#define DISPLAY_WIDTH 1024
-#define DISPLAY_HEIGHT (MAP_HEIGHT * TILE_HEIGHT)
+#define FPS 60.0
+#define MAP_WIDTH 337 // Quantas tiles tem na horizontal
+#define MAP_HEIGHT 16 // Quantas tiles tem na vertical
+#define TILE_WIDTH 40 // Largura de cada tile
+#define TILE_HEIGHT 40 // Altura de cada tile
+#define DISPLAY_WIDTH 1024 // Tamanho horizontal da tela
+#define DISPLAY_HEIGHT (MAP_HEIGHT * TILE_HEIGHT) // Tamanho vertical da tela
+
+#define TOP_SCORE_N 10 // Quantos scores são guardados no top score
 
 #define KEY_SEEN     1
 #define KEY_RELEASED 2
@@ -32,12 +35,9 @@ typedef enum {
     DESTROY
 } GameStates;
 
-//int GAME_STATE = INIT;
-
 int gameInit();
 int gamePlay(int* score);
 int gameEnding(int* score);
 int gameDestroy();
-void must_init(bool test, const char *description);
 
 #endif

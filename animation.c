@@ -64,7 +64,7 @@ ALLEGRO_BITMAP** loadMainFrames(){
 
 ALLEGRO_BITMAP*** loadSprites(){
     ALLEGRO_BITMAP*** sprites = calloc(ENTITY_SPRITES_N, sizeof(ALLEGRO_BITMAP**));
-    must_init(sprites, "sprites");
+    mustAllocate(sprites, "sprites");
 
     sprites[MAIN_CHARACTER_SPRITE] = loadMainFrames();
     sprites[GOOMBA_SPRITE] = loadGoombaFrames();

@@ -14,6 +14,13 @@ void** allocateMatrix(int size, long int width, long int height){
     return m;
 }
 
+void mustInit(bool test, const char *description){
+    if(test) return;
+
+    printf("Couldn't initialize %s\n", description);
+    exit(1);
+}
+
 void mustAllocate(void* ptr, char* str){
     if(ptr == NULL){
         fprintf(stderr, "Error allocating memory to %s\n", str);
