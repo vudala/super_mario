@@ -11,7 +11,6 @@ void game_init(){
     must_init(al_init(), "allegro");
     must_init(al_install_keyboard(), "keyboard");
     must_init(al_init_image_addon(), "image addon");
-    must_init(al_init_primitives_addon(), "primitives");
     must_init(al_install_audio(), "audio");
     must_init(al_init_acodec_addon(), "audio codecs");
     must_init(al_reserve_samples(16), "reserve samples");

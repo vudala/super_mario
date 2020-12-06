@@ -6,7 +6,7 @@
 #include <math.h>
 
 ALLEGRO_BITMAP** loadTileSprites(){
-    ALLEGRO_BITMAP** sprites = calloc(8, sizeof(ALLEGRO_BITMAP*));
+    ALLEGRO_BITMAP** sprites = calloc(TILES_SPRITES_N, sizeof(ALLEGRO_BITMAP*));
     mustAllocate(sprites, "sprites");
 
     sprites[0] = al_load_bitmap("resources/brick.png");
@@ -58,7 +58,7 @@ ALLEGRO_BITMAP** loadMainFrames(){
 }
 
 ALLEGRO_BITMAP*** loadSprites(){
-    ALLEGRO_BITMAP*** sprites = calloc(SPRITES_N, sizeof(ALLEGRO_BITMAP**));
+    ALLEGRO_BITMAP*** sprites = calloc(ENTITY_SPRITES_N, sizeof(ALLEGRO_BITMAP**));
     must_init(sprites, "sprites");
 
     sprites[MAIN_CHARACTER_SPRITE] = loadMainFrames();
@@ -72,7 +72,7 @@ ALLEGRO_BITMAP*** loadSprites(){
     return sprites;
 }
 
-int typeToSpriteID(char type){
+int entitySpriteID(char type){
     switch(type){
         case MAIN_CHARACTER: return MAIN_CHARACTER_SPRITE; break;
         case GOOMBA: return GOOMBA_SPRITE; break;
@@ -82,7 +82,6 @@ int typeToSpriteID(char type){
         case SHELL: return SHELL_SPRITE; break;
         case MUSHROOM: return MUSHROOM_SPRITE; break;
     }
-
     return MUSHROOM_SPRITE;
 }
 
@@ -157,12 +156,28 @@ void drawEntity(struct entity* en, int* offset, ALLEGRO_BITMAP*** sprites){
     }
 }
 
+int tileSpriteID(char type){
+    switch(type){
+        case EMPTY_BLOCK: return EMPTY_BLOCK_SPRITE; break;
+        case BRICK_BLOCK: return BRICK_BLOCK_SPRITE;
+        case HARD_BRICK_BLOCK: return HARD_BRICK_BLOCK_SPRITE; break;
+        case PIPE_BLOCK: return PIPE_BLOCK_SPRITE; break;
+        case PIPE_TOP_BLOCK: return PIPE_TOP_BLOCK_SPRITE; break;
+        case COIN_BLOCK: return COIN_BLOCK_SPRITE; break;
+        case STAR_BLOCK: return STAR_BLOCK_SPRITE; break;
+        case MUSHROOM_BLOCK: return MUSHROOM_BLOCK_SPRITE; break;
+        case FLOWER_BLOCK: return FLOWER_BLOCK_SPRITE; break;
+    }
+    
+    return EMPTY_BLOCK_SPRITE;
+}
+
 void drawTiles(struct tile** tiles, ALLEGRO_BITMAP** sprites, int* offset){
     int whichSprite = 0;
     for(int y = 0; y < MAP_HEIGHT; y++){
         for(int x = 0; x < MAP_WIDTH; x++){
             if(tiles[y][x].active){
-                whichSprite = getTileV(tiles[y][x].type);
+                whichSprite = tileSpriteID(tiles[y][x].type);
                 al_draw_bitmap(sprites[whichSprite],
                 tiles[y][x].x + *offset,
                 tiles[y][x].y,

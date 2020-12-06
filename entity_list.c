@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "entity_list.h"
+#include "entity.h"
 
 void createList(struct entityList* l){
     l->size = 0;
@@ -16,11 +17,11 @@ void destroyList(struct entityList* l){
     struct entityNode* next = l->start;
     while(l->start != NULL){
         l->start = next->next;        
+        destroyEntity(next->en);
         free(next);
         next = l->start;
     }
-    l->size = 0;
-    l->start = NULL;
+    free(l);
 }
 
 int insertEntity(struct entityList* l, struct entity* en){

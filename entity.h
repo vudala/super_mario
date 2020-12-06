@@ -4,6 +4,7 @@
 struct tile;
 #include "game.h"
 #include "animation.h"
+#include "entity_list.h"
 
 #define IDLE 0
 #define WALKING 1
@@ -25,10 +26,12 @@ typedef enum {
     FLOWER = 'F',
     STAR = 'S',
     SHELL = 'D',
-    MUSHROOM = 'M'
+    MUSHROOM = 'M',
+    COIN = 'C'
 } EntityTipe;
 
 struct entity {
+    int type; // Tipo de entidade
     int x; // Posicao X
     int y; // Posicao Y
     float dx; // Velocidade X
@@ -42,7 +45,7 @@ struct entity {
 };
 
 // Cria uma nova entidade
-struct entity* newEntity(int x, int y, int w, int h, int dir, int behavior, struct animation* anim);
+struct entity* newEntity(int type, int x, int y, int w, int h, int dir, int behavior, struct animation* anim);
 
 // Checa colisão entre duas entidades
 int entityCollision(struct entity* en1, struct entity* en2);
@@ -57,7 +60,7 @@ int entityUpCollision(struct entity* en1, struct entity* en2);
 void updateEntity(struct entity* en, struct tile** tiles);
 
 // Atualiza o estado do personagem principal
-void updateCharacter(struct entity* character, struct tile** tiles, unsigned char* key);
+void updateCharacter(struct entity* character, struct tile** tiles, struct entityList* entities, unsigned char* key);
 
 // Libera o espaço de memória ocupado pela entidade
 void destroyEntity(struct entity* en);

@@ -18,19 +18,6 @@ typedef enum {
     FLOWER_BLOCK = 'f'
 } TilesType;
 
-typedef enum {
-    EMPTY_BLOCK_V = 0,
-    BRICK_BLOCK_V,
-    HARD_BRICK_BLOCK_V,
-    PIPE_BLOCK_V,
-    PIPE_TOP_BLOCK_V,
-    COIN_BLOCK_V,
-    STAR_BLOCK_V,
-    MUSHROOM_BLOCK_V,
-    FLOWER_BLOCK_V
-} TilesValue;
-
-
 struct tile {
     int x;
     int y;
@@ -42,22 +29,25 @@ struct tile {
 };
 
 // Lê o arquivo de configuração do level, retorna as tiles dele e preenche as entidades
-struct tile** load_level(char* levelPath, struct entityList* l, ALLEGRO_BITMAP*** sprites);
+struct tile** loadLevel(char* levelPath, struct entityList* l, ALLEGRO_BITMAP*** sprites);
 
 // Aponta para a tile presente naquele par de coordenadas
 struct tile* pointToTile(int x, int y, struct tile** tiles);
 
-// Checa se há colisão acima da entidade
-int tileUpCollision(struct entity* en, struct tile** tiles/*, struct entityList* entities*/);
+// Retorna o ID da entidade correspondente ao tipo do bloco : -1 se não houver nada associado a ele
+int specialTileContent(char type);
 
-// Checa se há colisão abaixo da entidade
-int tileDownCollision(struct entity* en, struct tile** tiles);
+// Aponta para a tile em que há colisao acima, do contrário retorna NULL
+struct tile* tileUpCollision(struct entity* en, struct tile** tiles);
 
-// Checa se há colisão à esquerda da entidade
-int tileLeftCollision(struct entity* en, struct tile** tiles);
+// Aponta para a tile em que há colisao abaixo, do contrário retorna NULL
+struct tile* tileDownCollision(struct entity* en, struct tile** tiles);
 
-// Checa se há colisao à direita da entidade
-int tileRightCollision(struct entity* en, struct tile** tiles);
+// Aponta para a tile em que há colisao a esquerda, do contrário retorna NULL
+struct tile* tileLeftCollision(struct entity* en, struct tile** tiles);
+
+// Aponta para a tile em que há colisao a direita, do contrário retorna NULL
+struct tile* tileRightCollision(struct entity* en, struct tile** tiles);
 
 // Converte o valor C para um indice de um sprite
 int getTileV(char c);

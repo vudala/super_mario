@@ -23,20 +23,6 @@ struct tile* newTile(int x, int y, int w, int h, int active, int type){
     return t;
 }
 
-int getTileV(char c){
-    if(c == EMPTY_BLOCK) return EMPTY_BLOCK_V; 
-    if(c == BRICK_BLOCK) return BRICK_BLOCK_V;
-    if(c == HARD_BRICK_BLOCK) return HARD_BRICK_BLOCK_V;
-    if(c == PIPE_BLOCK) return PIPE_BLOCK_V;
-    if(c == PIPE_TOP_BLOCK) return PIPE_TOP_BLOCK_V;
-    if(c == COIN_BLOCK) return COIN_BLOCK_V;
-    if(c == STAR_BLOCK) return STAR_BLOCK_V;
-    if(c == MUSHROOM_BLOCK) return MUSHROOM_BLOCK_V;
-    if(c == FLOWER_BLOCK) return FLOWER_BLOCK_V;
-    return EMPTY_BLOCK_V;
-}
-
-
 struct tile* pointToTile(int x, int y, struct tile** tiles){
     if (x < 0 || y < 0 || x > MAP_WIDTH * TILE_WIDTH || y > MAP_HEIGHT * TILE_HEIGHT) return NULL;
     int i = floor(y / TILE_HEIGHT); // Linha da tile
@@ -44,9 +30,18 @@ struct tile* pointToTile(int x, int y, struct tile** tiles){
     return &tiles[i][j];
 }
 
+int specialTileContent(char type){
+    switch(type){
+        case COIN_BLOCK: return COIN; break;
+        case STAR_BLOCK: return STAR; break;
+        case MUSHROOM_BLOCK: return MUSHROOM; break;
+        case FLOWER_BLOCK: return FLOWER; break;
+    }
+    
+    return -1;
+}
 
-
-int tileLeftCollision(struct entity* en, struct tile** tiles){
+struct tile* tileLeftCollision(struct entity* en, struct tile** tiles){
     if(en->dx < 0){
         struct tile* left1 = pointToTile(en->x-1, en->y, tiles);
         struct tile* left2 = pointToTile(en->x-1, en->y+en->h - 1, tiles);
@@ -55,13 +50,14 @@ int tileLeftCollision(struct entity* en, struct tile** tiles){
             en->dx = 0;
             en->x = left1->x+left1->w;
             if(en->behavior != JUMPING) en->behavior = IDLE;
-            return 1;
+            if(left1->active) return left1;
+            return left2;
         }
     }
-    return 0;
+    return NULL;
 }
 
-int tileRightCollision(struct entity* en, struct tile** tiles){
+struct tile* tileRightCollision(struct entity* en, struct tile** tiles){
     if(en->dx > 0){
         struct tile* right1 = pointToTile(en->x+en->w, en->y, tiles);
         struct tile* right2 = pointToTile(en->x+en->w, en->y+en->h - 1, tiles);
@@ -70,35 +66,29 @@ int tileRightCollision(struct entity* en, struct tile** tiles){
             en->dx = 0;
             en->x = right1->x - right1->w;
             if(en->behavior != JUMPING) en->behavior = IDLE;
-            return 1;
+            if(right1->active) return right1;
+            return right2;
         }
     }
-    return 0;
+    return NULL;
 }
 
-int tileUpCollision(struct entity* en, struct tile** tiles/*, struct entityList* entities*/){
+
+struct tile* tileUpCollision(struct entity* en, struct tile** tiles){
     struct tile* up1 = pointToTile(en->x + 5, en->y, tiles);
     struct tile* up2 = pointToTile(en->x+en->w - 5, en->y, tiles);
     if(!up1 || !up2) return 0; // Se for outbounds
     if(up1->active || up2->active){
         en->dy = 0;
         en->y = up1->y + up1->h;
-        // if(up1->active){
-        //     switch(up1->type){
-        //         case COIN_BLOCK:case STAR_BLOCK:case MUSHROOM_BLOCK:case FLOWER_BLOCK:
-        //             insertEntity(entities, 
-        //             newEntity()
-        //             );
-        //             break;
-        //     }
-        // }
-        return 1;
+        if(up1->active) return up1;
+        return up2;
     }
     
-    return 0;
+    return NULL;
 }
 
-int tileDownCollision(struct entity* en, struct tile** tiles){
+struct tile* tileDownCollision(struct entity* en, struct tile** tiles){
     struct tile* down1 = pointToTile(en->x + 5, en->y+en->h, tiles);
     struct tile* down2 = pointToTile(en->x+en->w - 5, en->y+en->h, tiles);
     if(!down1 || !down2) return 0; // Se for outbounds
@@ -108,13 +98,14 @@ int tileDownCollision(struct entity* en, struct tile** tiles){
             en->dy = 0;
             en->y = down1->y - en->h;
         }
-        return 1;
+        if(down1->active) return down1;
+        return down2;
     }
     
-    return 0;
+    return NULL;
 }
 
-struct tile** load_level(char* levelPath, struct entityList* l, ALLEGRO_BITMAP*** sprites){
+struct tile** loadLevel(char* levelPath, struct entityList* l, ALLEGRO_BITMAP*** sprites){
     FILE* file = fopen(levelPath, "r");
     mustAllocate(file, levelPath);
     struct tile** t = (struct tile**) allocateMatrix(sizeof(struct tile), MAP_WIDTH, MAP_HEIGHT);
@@ -135,11 +126,11 @@ struct tile** load_level(char* levelPath, struct entityList* l, ALLEGRO_BITMAP**
         switch(c){
             case '\n': break;
             case MAIN_CHARACTER: case GOOMBA: case TURTLE:
-                whichSprite = typeToSpriteID(c);
+                whichSprite = entitySpriteID(c);
                 width = al_get_bitmap_width(sprites[whichSprite][0]);
                 height = al_get_bitmap_height(sprites[whichSprite][0]);
                 insertEntity(l,
-                    newEntity(j*TILE_WIDTH, i*TILE_HEIGHT, width, height, RIGHT, JUMPING, 
+                    newEntity(c, j*TILE_WIDTH, i*TILE_HEIGHT, width, height, RIGHT, JUMPING, 
                         newAnimation(whichSprite, 2, FRAME_DURATION))
                 );
                 newT = newTile( j * TILE_WIDTH, i * TILE_HEIGHT, TILE_WIDTH, TILE_HEIGHT, 0, EMPTY_BLOCK);

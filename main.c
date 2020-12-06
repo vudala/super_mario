@@ -23,10 +23,10 @@ int main()
     must_init(entities, "entities");
     createList(entities);
 
-    struct tile** tiles = load_level("level.txt", entities, sprites);
+    struct tile** tiles = loadLevel("level.txt", entities, sprites);
     
     struct animation* anim = newAnimation(MAIN_CHARACTER_SPRITE, 2, FRAME_DURATION);
-    struct entity* character = newEntity(120, 510,
+    struct entity* character = newEntity(MAIN_CHARACTER_SPRITE, 120, 510,
         al_get_bitmap_width(sprites[MAIN_CHARACTER_SPRITE][0]),
         al_get_bitmap_height(sprites[MAIN_CHARACTER_SPRITE][0]),
         RIGHT, JUMPING, anim);
@@ -36,20 +36,18 @@ int main()
     bool done = false;
     bool redraw = true;
     ALLEGRO_EVENT event;
-
     unsigned char key[ALLEGRO_KEY_MAX];
     memset(key, 0, sizeof(key));
-    int lost = 0;
+    
     al_start_timer(timer);
     for(;;)
     {
-        if (lost) break;
         al_wait_for_event(queue, &event);
 
         switch(event.type)
         {
             case ALLEGRO_EVENT_TIMER:
-                updateCharacter(character, tiles, key);
+                updateCharacter(character, tiles, entities, key);
 
                 struct entityNode* next = entities->start;
                 while(next != NULL){
@@ -60,8 +58,8 @@ int main()
                         character->dy = -12.5;
                         character->behavior = JUMPING;
                         al_play_sample(rojao, 1.0, 0.0, 1.0, ALLEGRO_PLAYMODE_ONCE, NULL);
-                    } else if(entityCollision(character, next->en)) // Se colidiram com as outras laterais
-                        lost = 1;
+                    } else if(entityCollision(character, next->en))
+                        done = true;
                     next = next->next;
                 }
                 
@@ -89,33 +87,39 @@ int main()
 
         if(redraw && al_is_event_queue_empty(queue))
         {
-            al_clear_to_color(al_map_rgb(120, 60, 180));
-
-            drawEntity(character, &offset, sprites);
+            al_clear_to_color(al_map_rgb(127, 127, 127));
+            // Desenha o mapa
             drawTiles(tiles, tileSprites, &offset);
-            //for(int i = 0; i < entN; i++) drawEntity(entities[i], &offset);
+            // Desenha o personagem principal
+            drawEntity(character, &offset, sprites);
+            // Desenha todas as outras entidades
             struct entityNode* next = entities->start;
             while(next != NULL){
                 drawEntity(next->en, &offset, sprites);
                 next = next->next;
             }
-            
             al_flip_display();
             redraw = false;
         }
     }
 
+    al_destroy_display(disp);
+    al_destroy_audio_stream(soundtrack);
+    al_destroy_sample(rojao);
+    al_destroy_font(font);
+    al_destroy_timer(timer);
+    al_destroy_event_queue(queue);
+
     for(int i = 0; i < TILES_N; i++) al_destroy_bitmap(tileSprites[i]);
     free(tileSprites);
     free(tiles[0]);
     free(tiles);
-    //destroyEntity(character);
-    al_destroy_audio_stream(soundtrack);
-    al_destroy_sample(rojao);
-    al_destroy_font(font);
-    al_destroy_display(disp);
-    al_destroy_timer(timer);
-    al_destroy_event_queue(queue);
+    destroyEntity(character);
+    destroyList(entities);
+    
+    for(int i = 0; i < ENTITY_SPRITES_N; i++)
+        for(int j = 0; j < FRAMES_N; j++)
+            al_destroy_bitmap(sprites[i][j]);
 
     return 0;
 }
