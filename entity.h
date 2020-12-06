@@ -16,6 +16,8 @@ struct tile;
 #define PLAYER_WALKING_SPEED 4.0
 #define MONSTER_WALKING_SPEED 2.0
 
+#define MAX_ENEMIES 50
+
 typedef enum {
     MAIN_CHARACTER = 'X',
     GOOMBA = 'g',
@@ -31,16 +33,36 @@ struct entity {
     int w; // Largura
     int h; // Altura
     int behavior; // Atual comportamento da entidade
+    int life; // Pontos de vida
     struct animation* anim; // Animação
+};
+
+// Lista de entidades
+struct enNode {
+    int id;
+    struct entity* en;
+    struct enNode* next;
 };
 
 // Cria uma nova entidade
 struct entity* newEntity(int x, int y, int dir, int behavior, struct animation* anim);
+
+// Checa colisãp entre entidades
+int entityCollision(struct entity* en1, struct entity* en2);
+
+// Checa colisão com outras entidades nos quatro extremos
+int entityLeftCollision(struct entity* en1, struct entity* en2);
+int entityRightCollision(struct entity* en1, struct entity* en2);
+int entityDownCollision(struct entity* en1, struct entity* en2);
+int entityUpCollision(struct entity* en1, struct entity* en2);
 
 // Atualiza o estado de uma entidade qualquer
 void updateEntity(struct entity* en, struct tile** tiles);
 
 // Atualiza o estado do personagem principal
 void updateCharacter(struct entity* character, struct tile** tiles, struct entity** entities, unsigned char* key);
+
+// Libera o espaço de memória ocupado pela entidade
+void destroyEntity(struct entity* en);
 
 #endif

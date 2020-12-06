@@ -20,8 +20,50 @@ struct entity* newEntity(int x, int y, int dir, int behavior, struct animation* 
     en->h = al_get_bitmap_height(anim->frames[0]); // Usa as dimensoes do primeiro frame
     en->behavior = behavior;
     en->anim = anim;
+    en->life = 1;
 
     return en;
+}
+
+int entityCollision(struct entity* en1, struct entity* en2){
+    if(en1->x > en2->x + en2->w) return 0;
+    if(en1->x + en1->w < en2->x ) return 0;
+    if(en1->y > en2->y + en2->h) return 0;
+    if(en1->y + en1->h < en2->y) return 0;
+
+    return 1;
+}
+
+int entityLeftCollision(struct entity* en1, struct entity* en2){
+    if(entityCollision(en1, en2)) // Se colidiu
+        // Se en1 estiver a direita de en2
+        if(en1->x + en1->w > en2->x + en2->w) 
+            return 1;
+    return 0;
+}
+
+int entityRightCollision(struct entity* en1, struct entity* en2){
+    if(entityCollision(en1, en2)) // Se colidiu
+        // Se en1 estiver a esquerda de en2
+        if(en1->x + en1->w < en2->x + en2->w) 
+            return 1;
+    return 0;
+}
+
+int entityDownCollision(struct entity* en1, struct entity* en2){
+    if(entityCollision(en1, en2)) // Se colidiu
+        // Se en1 estiver a acima de en2
+        if(en1->y + en1->h < en2->y + en2->h) 
+            return 1;
+    return 0;
+}
+
+int entityUpCollision(struct entity* en1, struct entity* en2){
+    if(entityCollision(en1, en2)) // Se colidiu
+        // Se en1 estiver a abaixo de en2
+        if(en1->y > en2->y) 
+            return 1;
+    return 0;
 }
 
 void updateEntity(struct entity* en, struct tile** tiles){
@@ -54,6 +96,7 @@ void updateEntity(struct entity* en, struct tile** tiles){
 }
 
 void updateCharacter(struct entity* character, struct tile** tiles, struct entity** entities, unsigned char* key){
+    if(entities != NULL) return;
     switch(character->behavior){
         case IDLE:
             if (key[ALLEGRO_KEY_SPACE]){

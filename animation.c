@@ -88,7 +88,7 @@ void drawEntity(struct entity* en, int* offset){
     switch(en->behavior){
         case IDLE:
             if(en->dir)
-                al_draw_bitmap(en->anim->frames[1],
+                al_draw_bitmap(en->anim->frames[IDLE_FRAME],
                 floor(*offset + en->x), floor(en->y),
                 0);
             else

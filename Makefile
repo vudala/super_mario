@@ -1,9 +1,9 @@
 
 CC = gcc
 CFLAGS = -Wall
-OBJECTS = main.o game.o level.o entity.o utils.o animation.o
-HEADERS = game.h level.h entity.h utils.h animation.h
-LIBS = -lallegro_font -lallegro_image -lallegro_primitives -lallegro -lm
+OBJECTS = main.o game.o level.o entity.o utils.o animation.o entity_list.o
+HEADERS = game.h level.h entity.h utils.h animation.h entity_list.h
+LIBS = -lallegro_font -lallegro_image -lallegro_primitives -lallegro -lallegro_audio -lallegro_acodec -lm
 OUTPUT = game
 
 all: $(OBJECTS)
@@ -20,6 +20,9 @@ level.o: level.c
 
 entity.o: entity.c
 	$(CC) -g -c entity.c $(CFLAGS)
+
+entity_list.o: entity_list.c
+	$(CC) -g -c entity_list.c $(CFLAGS)
 
 utils.o: utils.c
 	$(CC) -g -c utils.c $(CFLAGS)

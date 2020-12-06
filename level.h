@@ -2,7 +2,9 @@
 #define LEVEL_INCLUDED
 
 struct entity;
+#include "entity_list.h"
 
+#define TILES_N 9
 typedef enum {
     EMPTY_BLOCK = ' ',
     BRICK_BLOCK = 'b',
@@ -38,9 +40,9 @@ struct tile {
     int highlight;
 };
 
-struct tile** load_level(char* levelPath);
+struct tile** load_level(char* levelPath, struct entityList* l, int* id);
 
-struct entity** loadEntities(char* levelPath, int* n);
+struct entityList** loadEntities(char* levelPath, int* id);
 
 // Aponta para a tile presente naquele par de coordenadas
 struct tile* pointToTile(int x, int y, struct tile** tiles);

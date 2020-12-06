@@ -5,6 +5,7 @@
 #include "level.h"
 #include "game.h"
 #include "entity.h"
+#include "entity_list.h"
 #include <math.h>
 
 struct tile* newTile(int x, int y, int w, int h, int active, int type){
@@ -103,38 +104,38 @@ int tileDownCollision(struct entity* en, struct tile** tiles){
     return 0;
 }
 
-struct entity** loadEntities(char* levelPath, int* n){
-    FILE* file = fopen(levelPath, "r");
-    mustAllocate(file, levelPath);
-    struct entity** entities = calloc(50, sizeof(struct entity*));
-    mustAllocate(entities, "entities");
+// struct entityList* loadEntities(char* levelPath, int* id){
+//     FILE* file = fopen(levelPath, "r");
+//     mustAllocate(file, levelPath);
+//     struct entityList* l = malloc(sizeof(struct entityList));
+//     createList(l);
 
-    char c;
-    int i = 0, j = 0;
-    int e = 0;
-    while((c = fgetc(file)) != EOF){
-        if(j == MAP_WIDTH){
-            fgetc(file);
-            i++;
-            j = 0;
-        }
-        switch(c){
-            case MAIN_CHARACTER: case GOOMBA: case TURTLE:
-                entities[e] = newEntity(j*TILE_WIDTH, i*TILE_HEIGHT
-                , RIGHT, JUMPING, 
-                newAnimation(loadGoombaFrames(), 2, FRAME_DURATION));
-                e++;
-                break;
-        }
-        j++;
-    }
-    *n = e;
-    fclose(file);
+//     char c;
+//     int i = 0, j = 0;
+//     int e = 0;
+//     while((c = fgetc(file)) != EOF){
+//         if(j == MAP_WIDTH){
+//             fgetc(file);
+//             i++;
+//             j = 0;
+//         }
+//         switch(c){
+//             case MAIN_CHARACTER: case GOOMBA: case TURTLE:
+//                 insertEntity(l,
+//                     newEntity(j*TILE_WIDTH, i*TILE_HEIGHT,RIGHT, JUMPING, 
+//                     newAnimation(loadGoombaFrames(), 2, FRAME_DURATION)),
+//                 id++);
+//                 break;
+//         }
+//         j++;
+//     }
 
-    return entities;
-}
+//     fclose(file);
 
-struct tile** load_level(char* levelPath){
+//     return l;
+// }
+
+struct tile** load_level(char* levelPath, struct entityList* l, int* id){
     FILE* file = fopen(levelPath, "r");
     mustAllocate(file, levelPath);
     struct tile** t = (struct tile**) allocateMatrix(sizeof(struct tile), MAP_WIDTH, MAP_HEIGHT);
@@ -153,6 +154,10 @@ struct tile** load_level(char* levelPath){
         switch(c){
             case '\n': break;
             case MAIN_CHARACTER: case GOOMBA: case TURTLE:
+                insertEntity(l,
+                    newEntity(j*TILE_WIDTH, i*TILE_HEIGHT,RIGHT, JUMPING, 
+                    newAnimation(loadGoombaFrames(), 2, FRAME_DURATION)),
+                id++);
                 newT = newTile( j * TILE_WIDTH, i * TILE_HEIGHT, TILE_WIDTH, TILE_HEIGHT, 0, EMPTY_BLOCK);
                 t[i][j] = *newT;
                 free(newT);
