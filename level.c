@@ -1,12 +1,13 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include "utils.h"
 #include "level.h"
-#include "game.h"
+#include "utils.h"
 #include "entity.h"
 #include "entity_list.h"
 #include "animation.h"
+#include "game.h"
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include <math.h>
 
 struct tile* newTile(int x, int y, int w, int h, int active, int type){

@@ -1,8 +1,10 @@
 #ifndef ANIMATION_INCLUDED
 #define ANIMATION_INCLUDED
+
 #include "game.h"
-struct entity;
-struct tile;
+#include "entity.h"
+#include "level.h"
+#include "entity_list.h"
 
 #define FRAMES_N 4 // Quantos frames tem a animação
 #define FRAME_DURATION 10 // Duração padrão de cada frame da animação

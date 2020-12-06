@@ -1,9 +1,9 @@
 #ifndef LEVEL_INCLUDED
 #define LEVEL_INCLUDED
 
+typedef struct ALLEGRO_BITMAP ALLEGRO_BITMAP;
 struct entity;
-#include "entity_list.h"
-#include "game.h"
+struct entityList;
 
 #define TILES_N 9
 typedef enum {

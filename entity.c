@@ -1,7 +1,6 @@
-#include "level.h"
 #include "entity.h"
-#include "game.h"
 #include "utils.h"
+#include "game.h"
 
 #include <stdlib.h>
 #include <stdio.h>

@@ -1,10 +1,9 @@
 #ifndef ENTITY_INCLUDED
 #define ENTITY_INCLUDED
 
-struct tile;
-#include "game.h"
-#include "animation.h"
+#include "level.h"
 #include "entity_list.h"
+#include "animation.h"
 
 #define IDLE 0
 #define WALKING 1

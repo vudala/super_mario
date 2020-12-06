@@ -1,7 +1,8 @@
-#include <stdio.h>
-#include <stdlib.h>
 #include "entity_list.h"
 #include "entity.h"
+
+#include <stdio.h>
+#include <stdlib.h>
 
 void createList(struct entityList* l){
     l->size = 0;

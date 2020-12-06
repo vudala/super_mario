@@ -2,6 +2,7 @@
 #include "entity.h"
 #include "utils.h"
 #include "level.h"
+#include "game.h"
 
 #include <math.h>
 
@@ -9,23 +10,23 @@ ALLEGRO_BITMAP** loadTileSprites(){
     ALLEGRO_BITMAP** sprites = calloc(TILES_SPRITES_N, sizeof(ALLEGRO_BITMAP*));
     mustAllocate(sprites, "sprites");
 
-    sprites[0] = al_load_bitmap("resources/brick.png");
+    sprites[0] = al_load_bitmap("resources/sprites/tiles/brick.png");
     mustAllocate(sprites[0],"a");
-    sprites[1] = al_load_bitmap("resources/brick.png");
+    sprites[1] = al_load_bitmap("resources/sprites/tiles/brick.png");
     mustAllocate(sprites[1],"a");
-    sprites[2] = al_load_bitmap("resources/brick.png");
+    sprites[2] = al_load_bitmap("resources/sprites/tiles/brick.png");
     mustAllocate(sprites[2],"a");
-    sprites[3] = al_load_bitmap("resources/pipe.png");
+    sprites[3] = al_load_bitmap("resources/sprites/tiles/pipe.png");
     mustAllocate(sprites[3],"a");
-    sprites[4] = al_load_bitmap("resources/pipe_top.png");
+    sprites[4] = al_load_bitmap("resources/sprites/tiles/pipe_top.png");
     mustAllocate(sprites[4],"a");
-    sprites[5] = al_load_bitmap("resources/surprise.png");
+    sprites[5] = al_load_bitmap("resources/sprites/tiles/surprise.png");
     mustAllocate(sprites[5],"a");
-    sprites[6] = al_load_bitmap("resources/surprise.png");
+    sprites[6] = al_load_bitmap("resources/sprites/tiles/surprise.png");
     mustAllocate(sprites[6],"a");
-    sprites[7] = al_load_bitmap("resources/surprise.png");
+    sprites[7] = al_load_bitmap("resources/sprites/tiles/surprise.png");
     mustAllocate(sprites[7],"a");
-    sprites[8] = al_load_bitmap("resources/surprise.png");
+    sprites[8] = al_load_bitmap("resources/sprites/tiles/surprise.png");
     mustAllocate(sprites[8],"a");
 
     return sprites;
@@ -34,15 +35,17 @@ ALLEGRO_BITMAP** loadTileSprites(){
 // Carrega as sprites do goomba
 ALLEGRO_BITMAP** loadGoombaFrames(){
     ALLEGRO_BITMAP** frames = malloc(sizeof(ALLEGRO_BITMAP*) * 4);
-    mustAllocate(frames, "frames");
-    frames[0] = al_load_bitmap("resources/sprites/goomba_walk1.png");
-    mustAllocate(frames[0], "frames");
-    frames[1] = al_load_bitmap("resources/sprites/goomba_idle.png");
-    mustAllocate(frames[1], "frames");
-    frames[2] = al_load_bitmap("resources/sprites/goomba_walk2.png");
-    mustAllocate(frames[2], "frames");
-    frames[3] = al_load_bitmap("resources/sprites/goomba_jump.png");
-    mustAllocate(frames[3], "frames");
+    mustAllocate(frames, "goomba frames");
+
+    frames[0] = al_load_bitmap("resources/sprites/goomba/goomba_walk1.png");
+    mustAllocate(frames[0], "goomba_walk1");
+    frames[1] = al_load_bitmap("resources/sprites/goomba/goomba_idle.png");
+    mustAllocate(frames[1], "goombla_idle");
+    frames[2] = al_load_bitmap("resources/sprites/goomba/goomba_walk2.png");
+    mustAllocate(frames[2], "goomba_walk2");
+    frames[3] = al_load_bitmap("resources/sprites/goomba/goomba_jump.png");
+    mustAllocate(frames[3], "goomba_jump");
+
     return frames;
 }
 
@@ -50,10 +53,12 @@ ALLEGRO_BITMAP** loadGoombaFrames(){
 ALLEGRO_BITMAP** loadMainFrames(){
     ALLEGRO_BITMAP** frames = malloc(sizeof(ALLEGRO_BITMAP*) * 4);
     mustAllocate(frames, "frames");
-    frames[0] = al_load_bitmap("resources/sprites/mario_walk1.png");
-    frames[1] = al_load_bitmap("resources/sprites/mario_idle.png");
-    frames[2] = al_load_bitmap("resources/sprites/mario_walk2.png");
-    frames[3] = al_load_bitmap("resources/sprites/mario_jump.png");
+
+    frames[0] = al_load_bitmap("resources/sprites/mario/mario_walk1.png");
+    frames[1] = al_load_bitmap("resources/sprites/mario/mario_idle.png");
+    frames[2] = al_load_bitmap("resources/sprites/mario/mario_walk2.png");
+    frames[3] = al_load_bitmap("resources/sprites/mario/mario_jump.png");
+    
     return frames;
 }
 

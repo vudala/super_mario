@@ -1,4 +1,5 @@
 #include "utils.h"
+
 #include <stdlib.h>
 #include <stdio.h>
 
@@ -15,7 +16,7 @@ void** allocateMatrix(int size, long int width, long int height){
 
 void mustAllocate(void* ptr, char* str){
     if(ptr == NULL){
-        fprintf(stderr, "Error allocating memory to %s", str);
+        fprintf(stderr, "Error allocating memory to %s\n", str);
         exit(1);
     }
 }

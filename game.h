@@ -1,10 +1,6 @@
 #ifndef GAME_INCLUDED
 #define GAME_INCLUDED
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdbool.h>
-
 #include <allegro5/allegro5.h>
 #include <allegro5/allegro_font.h>
 #include <allegro5/allegro_image.h>
@@ -26,8 +22,22 @@ ALLEGRO_TIMER* timer;
 ALLEGRO_EVENT_QUEUE* queue;
 ALLEGRO_DISPLAY* disp;
 ALLEGRO_FONT* font;
+ALLEGRO_EVENT event;
+unsigned char key[ALLEGRO_KEY_MAX];
 
-void game_init();
+typedef enum {
+    INIT = 0,
+    PLAY,
+    ENDING,
+    DESTROY
+} GameStates;
+
+//int GAME_STATE = INIT;
+
+int gameInit();
+int gamePlay(int* score);
+int gameEnding(int* score);
+int gameDestroy();
 void must_init(bool test, const char *description);
 
 #endif

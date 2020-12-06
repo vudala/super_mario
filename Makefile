@@ -1,34 +1,34 @@
 
 CC = gcc
-CFLAGS = -Wall
+CFLAGS = -Wall -std=c99
 OBJECTS = main.o game.o level.o entity.o utils.o animation.o entity_list.o
 HEADERS = game.h level.h entity.h utils.h animation.h entity_list.h
 LIBS = -lallegro_font -lallegro_image -lallegro_primitives -lallegro -lallegro_audio -lallegro_acodec -lm
 OUTPUT = game
 
 all: $(OBJECTS)
-	$(CC) $(OBJECTS) $(HEADERS) -o $(OUTPUT) $(LIBS) $(CFLAGS)
+	$(CC) $(CFLAGS) $(OBJECTS) -o $(OUTPUT) $(LIBS)
 
 main.o: main.c
-	$(CC) -g -c main.c $(CFLAGS)
+	$(CC) $(CFLAGS) -g -c main.c 
 
 game.o: game.c
-	$(CC) -g -c game.c $(CFLAGS)
+	$(CC) $(CFLAGS) -g -c game.c 
 
 level.o: level.c
-	$(CC) -g -c level.c $(CFLAGS)
+	$(CC) $(CFLAGS) -g -c level.c 
 
 entity.o: entity.c
-	$(CC) -g -c entity.c $(CFLAGS)
+	$(CC) $(CFLAGS) -g -c entity.c
 
 entity_list.o: entity_list.c
-	$(CC) -g -c entity_list.c $(CFLAGS)
+	$(CC) $(CFLAGS) -g -c entity_list.c
 
 utils.o: utils.c
-	$(CC) -g -c utils.c $(CFLAGS)
+	$(CC) $(CFLAGS) -g -c utils.c
 
 animation.o: animation.c
-	$(CC) -g -c animation.c $(CFLAGS)
+	$(CC) $(CFLAGS) -g -c animation.c
 
 clean:
 	rm -rf $(OBJECTS)
