@@ -32,6 +32,7 @@ ALLEGRO_BITMAP** loadTileSprites(){
     return sprites;
 }
 
+
 // Carrega as sprites do goomba
 ALLEGRO_BITMAP** loadGoombaFrames(){
     ALLEGRO_BITMAP** frames = malloc(sizeof(ALLEGRO_BITMAP*) * 4);
@@ -46,6 +47,57 @@ ALLEGRO_BITMAP** loadGoombaFrames(){
     frames[3] = al_load_bitmap("resources/sprites/goomba/goomba_jump.png");
     mustAllocate(frames[3], "goomba_jump");
 
+    return frames;
+}
+
+// Carrega as sprites da flor
+ALLEGRO_BITMAP** loadFlowerFrames(){
+    ALLEGRO_BITMAP** frames = malloc(sizeof(ALLEGRO_BITMAP*) * 4);
+    mustAllocate(frames, "flower frames");
+
+    for(int i = 0; i < 4; i++){
+        frames[i] = al_load_bitmap("resources/sprites/collectables/flower.png");
+        mustAllocate(frames[i], "flower");
+    }
+    
+    return frames;
+}
+
+// Carrega as sprites da estrela
+ALLEGRO_BITMAP** loadStarFrames(){
+    ALLEGRO_BITMAP** frames = malloc(sizeof(ALLEGRO_BITMAP*) * 4);
+    mustAllocate(frames, "star frames");
+
+    for(int i = 0; i < 4; i++){
+        frames[i] = al_load_bitmap("resources/sprites/collectables/star.png");
+        mustAllocate(frames[i], "star");
+    }
+    
+    return frames;
+}
+// ----------- SOON ------
+// ALLEGRO_BITMAP** loadShellFrames(){
+//     ALLEGRO_BITMAP** frames = malloc(sizeof(ALLEGRO_BITMAP*) * 4);
+//     mustAllocate(frames, "star frames");
+
+//     for(int i = 0; i < 4; i++){
+//         frames[i] = al_load_bitmap("resources/sprites/collectables/star.png");
+//         mustAllocate(frames[i], "star");
+//     }
+    
+//     return frames;
+// }
+
+// Carrega as sprites do cogumelo
+ALLEGRO_BITMAP** loadMushroomFrames(){
+    ALLEGRO_BITMAP** frames = malloc(sizeof(ALLEGRO_BITMAP*) * 4);
+    mustAllocate(frames, "mushroom frames");
+
+    for(int i = 0; i < 4; i++){
+        frames[i] = al_load_bitmap("resources/sprites/collectables/mushroom.png");
+        mustAllocate(frames[i], "mushroom");
+    }
+    
     return frames;
 }
 
@@ -69,10 +121,10 @@ ALLEGRO_BITMAP*** loadSprites(){
     sprites[MAIN_CHARACTER_SPRITE] = loadMainFrames();
     sprites[GOOMBA_SPRITE] = loadGoombaFrames();
     sprites[TURTLE_SPRITE] = loadGoombaFrames();
-    sprites[FLOWER_SPRITE] = loadGoombaFrames();
-    sprites[STAR_SPRITE] = loadGoombaFrames();
+    sprites[FLOWER_SPRITE] = loadFlowerFrames();
+    sprites[STAR_SPRITE] = loadStarFrames();
     sprites[SHELL_SPRITE] = loadGoombaFrames();
-    sprites[MUSHROOM_SPRITE] = loadGoombaFrames();
+    sprites[MUSHROOM_SPRITE] = loadMushroomFrames();
 
     return sprites;
 }

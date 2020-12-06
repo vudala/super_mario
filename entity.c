@@ -6,6 +6,10 @@
 #include <stdio.h>
 #include <math.h>
 
+void destroyEntity(struct entity* en){
+    free(en->anim);
+    free(en);
+}
 struct entity* newEntity(int type, int x, int y, int w, int h, int dir, int behavior, struct animation* anim){
     struct entity* en = malloc(sizeof(struct entity));
     mustAllocate(en, "entity");
@@ -114,7 +118,6 @@ void updateCharacter(struct entity* character, struct tile** tiles, struct entit
                 character->behavior = WALKING;
             } else
                 character->dx = 0;
-
             
             tileUpCollision(character, tiles);
             tileLeftCollision(character, tiles);
@@ -187,7 +190,3 @@ void updateCharacter(struct entity* character, struct tile** tiles, struct entit
     character->x += character->dx;
 }
 
-void destroyEntity(struct entity* en){
-    free(en->anim);
-    free(en);
-}

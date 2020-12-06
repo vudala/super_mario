@@ -88,12 +88,11 @@ int gamePlay(int* score){
                         character->dy = -12.5;
                         character->behavior = JUMPING;
                         al_play_sample(rojao, 1.0, 0.0, 1.0, ALLEGRO_PLAYMODE_ONCE, NULL);
+                        break;
                     } else if(entityCollision(character, next->en)){
                         newState = ENDING;
                         done = true;
-                    }
-
-                        
+                    }   
                     next = next->next;
                 }
                 
