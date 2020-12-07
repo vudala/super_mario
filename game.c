@@ -61,7 +61,7 @@ int gamePlay(int* score){
     struct entity* character = newEntity(MAIN_CHARACTER_SPRITE, 120, 510,
         al_get_bitmap_width(sprites[MAIN_CHARACTER_SPRITE][0]),
         al_get_bitmap_height(sprites[MAIN_CHARACTER_SPRITE][0]),
-        RIGHT, JUMPING, anim);
+        RIGHT, JUMPING, anim, -1);
 
     int offset = 0;
 
@@ -76,24 +76,10 @@ int gamePlay(int* score){
         switch(event.type)
         {
             case ALLEGRO_EVENT_TIMER:
-                updateCharacter(character, tiles, entities, key);
-
-                struct entityNode* next = entities->start;
-                while(next != NULL){
-                    updateEntity(next->en, tiles);
-                    // Se pulou em cima de um inimigo
-                    if(entityDownCollision(character, next->en)){
-                        *score += 100;
-                        removeEntity(next->id, entities);
-                        character->dy = -12.5;
-                        character->behavior = JUMPING;
-                        al_play_sample(rojao, 1.0, 0.0, 1.0, ALLEGRO_PLAYMODE_ONCE, NULL);
-                        break;
-                    } else if(entityCollision(character, next->en)){
-                        newState = ENDING;
-                        done = true;
-                    }   
-                    next = next->next;
+                // Se colidiu com outra entidade inimiga sem matá-la, termina o jogo
+                if(gameUpdate(character, tiles, entities, key)){
+                    newState = ENDING;
+                    done = true;
                 }
                 
                 offset = -(character->x - (DISPLAY_WIDTH / 2));

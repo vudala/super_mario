@@ -6,7 +6,7 @@ int main(){
     
     for(;;) switch(gameState){
         case INIT: gameState = gameInit(); break;
-        case PLAY: gameState =gamePlay(&score); break;
+        case PLAY: gameState = gamePlay(&score); break;
         case ENDING: gameState = gameEnding(&score); break;
         case DESTROY: gameState = gameDestroy(); break;
     }

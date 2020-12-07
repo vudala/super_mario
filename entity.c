@@ -10,7 +10,8 @@ void destroyEntity(struct entity* en){
     free(en->anim);
     free(en);
 }
-struct entity* newEntity(int type, int x, int y, int w, int h, int dir, int behavior, struct animation* anim){
+
+struct entity* newEntity(int type, int x, int y, int w, int h, int dir, int behavior, struct animation* anim, int lSpan){
     struct entity* en = malloc(sizeof(struct entity));
     mustAllocate(en, "entity");
 
@@ -25,6 +26,8 @@ struct entity* newEntity(int type, int x, int y, int w, int h, int dir, int beha
     en->behavior = behavior;
     en->anim = anim;
     en->life = 1;
+    en->lifeSpan = lSpan;
+   
 
     return en;
 }
@@ -70,7 +73,10 @@ int entityUpCollision(struct entity* en1, struct entity* en2){
     return 0;
 }
 
-void updateEntity(struct entity* en, struct tile** tiles){
+int updateEntity(struct entity* en, struct tile** tiles){
+    en->lifeSpan -= 1;
+    if(en->lifeSpan == 0 || en->life == 0) return 1;
+
     switch(en->behavior){
         case JUMPING:
             if(en->dir) en->dx = MONSTER_WALKING_SPEED;
@@ -98,9 +104,12 @@ void updateEntity(struct entity* en, struct tile** tiles){
 
     en->y += en->dy;
     en->x += en->dx;
+
+    return 0;
 }
 
-void updateCharacter(struct entity* character, struct tile** tiles, struct entityList* entities, unsigned char* key){
+struct tile* updateCharacter(struct entity* character, struct tile** tiles, unsigned char* key){
+    struct tile* rValue = NULL; // Valor de retorno
     switch(character->behavior){
         case IDLE:
             if (key[ALLEGRO_KEY_SPACE]){
@@ -138,23 +147,13 @@ void updateCharacter(struct entity* character, struct tile** tiles, struct entit
             // Se estiver caindo
             if(character->dy >= 0) tileDownCollision(character, tiles);
             else {
-                /* Se colidiu acima, checa se é um bloco especial
-                e adiciona uma nova entidade correspondete ao bloco */
+                // Se colidiu acima, checa se é um bloco especial o retorna
                 struct tile* aux = tileUpCollision(character, tiles);
-                if (aux) switch(aux->type){
-                    case COIN_BLOCK:case STAR_BLOCK:case MUSHROOM_BLOCK:case FLOWER_BLOCK:;
-                        int behavior = JUMPING; // Nasce sendo puxado pela gravidade
-                        if(aux->type == FLOWER_BLOCK || aux->type == COIN_BLOCK)
-                            behavior = IDLE; // Nasce parado
-                        int enType = specialTileContent(aux->type); // Tipo da entidade
-                        int whichSprite = entitySpriteID(enType); // Qual sprite deve usar
-                        struct entity* newEn = newEntity(enType,
-                            aux->x, aux->y - aux->h, aux->w, aux->h, RIGHT, behavior,
-                            newAnimation(whichSprite, 2, FRAME_DURATION)
-                        );
-                        insertEntity(entities, newEn);
-                        break;
-                    }
+            if (aux) switch(aux->type){
+                case COIN_BLOCK:case STAR_BLOCK:case MUSHROOM_BLOCK:case FLOWER_BLOCK:
+                        rValue = aux;
+            }
+                    
             }
             // Se estiver indo a direita
             if(character->dir) tileRightCollision(character, tiles);
@@ -188,5 +187,51 @@ void updateCharacter(struct entity* character, struct tile** tiles, struct entit
 
     character->y += character->dy;
     character->x += character->dx;
+
+    return rValue;
 }
 
+int gameUpdate(struct entity* character, struct tile** tiles, struct entityList* entities, unsigned char* key){
+    struct tile* t = updateCharacter(character, tiles, key);
+    if(t){
+        switch (t->type){
+            case COIN_BLOCK:case STAR_BLOCK:case MUSHROOM_BLOCK:case FLOWER_BLOCK:;
+                int enType = specialTileContent(t->type);
+                int whichSprite = entitySpriteID(enType);
+                struct entity* newEn = newEntity(enType, t->x, t->y - t->h, t->w, t->h,
+                    !character->dir, enType == FLOWER || enType == COIN ? IDLE : JUMPING,
+                    newAnimation(whichSprite, 2, FRAME_DURATION),
+                    enType == COIN ? 10 : -1
+                );
+                insertEntity(entities, newEn);
+                break;
+        }   
+    }
+
+    struct entityNode* next = entities->start;
+    while(next != NULL){
+        if(updateEntity(next->en, tiles)) removeEntity(next->id, entities);
+        // Se pulou em cima de um inimigo
+        if(entityDownCollision(character, next->en)){
+            removeEntity(next->id, entities);
+            character->dy = -12.5;
+            character->behavior = JUMPING;
+            break;
+        } else if(entityCollision(character, next->en)){
+            if(next->en->type == MUSHROOM){
+                //giveMushroomPower(character);
+                removeEntity(next->id, entities);
+            }
+            else if (next->en->type == FLOWER){
+                //giveFlowerPower(character);
+                removeEntity(next->id, entities);
+            }   
+            else if (next->en->type == STAR){
+                //giveStarPower(character);
+                removeEntity(next->id, entities);
+            } else return 1;
+        }
+        next = next->next;
+    }
+    return 0;
+}

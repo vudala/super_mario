@@ -75,6 +75,7 @@ ALLEGRO_BITMAP** loadStarFrames(){
     
     return frames;
 }
+
 // ----------- SOON ------
 // ALLEGRO_BITMAP** loadShellFrames(){
 //     ALLEGRO_BITMAP** frames = malloc(sizeof(ALLEGRO_BITMAP*) * 4);
@@ -96,6 +97,18 @@ ALLEGRO_BITMAP** loadMushroomFrames(){
     for(int i = 0; i < 4; i++){
         frames[i] = al_load_bitmap("resources/sprites/collectables/mushroom.png");
         mustAllocate(frames[i], "mushroom");
+    }
+    
+    return frames;
+}
+
+ALLEGRO_BITMAP** loadCoinFrames(){
+    ALLEGRO_BITMAP** frames = malloc(sizeof(ALLEGRO_BITMAP*) * 4);
+    mustAllocate(frames, "coin frames");
+
+    for(int i = 0; i < 4; i++){
+        frames[i] = al_load_bitmap("resources/sprites/collectables/coin.png");
+        mustAllocate(frames[i], "coin");
     }
     
     return frames;
@@ -125,6 +138,7 @@ ALLEGRO_BITMAP*** loadSprites(){
     sprites[STAR_SPRITE] = loadStarFrames();
     sprites[SHELL_SPRITE] = loadGoombaFrames();
     sprites[MUSHROOM_SPRITE] = loadMushroomFrames();
+    sprites[COIN_SPRITE] = loadCoinFrames();
 
     return sprites;
 }
@@ -138,6 +152,7 @@ int entitySpriteID(char type){
         case STAR: return STAR_SPRITE; break;
         case SHELL: return SHELL_SPRITE; break;
         case MUSHROOM: return MUSHROOM_SPRITE; break;
+        case COIN: return COIN_SPRITE; break;
     }
     return MUSHROOM_SPRITE;
 }

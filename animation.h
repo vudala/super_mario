@@ -19,7 +19,8 @@ typedef enum {
     FLOWER_SPRITE,
     STAR_SPRITE,
     SHELL_SPRITE,
-    MUSHROOM_SPRITE
+    MUSHROOM_SPRITE,
+    COIN_SPRITE
 } EntitySpritesID;
 
 #define TILES_SPRITES_N 9

@@ -132,7 +132,7 @@ struct tile** loadLevel(char* levelPath, struct entityList* l, ALLEGRO_BITMAP***
                 height = al_get_bitmap_height(sprites[whichSprite][0]);
                 insertEntity(l,
                     newEntity(c, j*TILE_WIDTH, i*TILE_HEIGHT, width, height, RIGHT, JUMPING, 
-                        newAnimation(whichSprite, 2, FRAME_DURATION))
+                        newAnimation(whichSprite, 2, FRAME_DURATION), -1)
                 );
                 newT = newTile( j * TILE_WIDTH, i * TILE_HEIGHT, TILE_WIDTH, TILE_HEIGHT, 0, EMPTY_BLOCK);
                 t[i][j] = *newT;

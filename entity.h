@@ -40,11 +40,14 @@ struct entity {
     int h; // Altura
     int behavior; // Atual comportamento da entidade
     int life; // Pontos de vida
+    /* A cada frame diminui o tempo de vida da entidade, utilizado para controlar as entidades
+    temporarias */
+    int lifeSpan;
     struct animation* anim; // Animação
 };
 
 // Cria uma nova entidade
-struct entity* newEntity(int type, int x, int y, int w, int h, int dir, int behavior, struct animation* anim);
+struct entity* newEntity(int type, int x, int y, int w, int h, int dir, int behavior, struct animation* anim, int lSpan);
 
 // Checa colisão entre duas entidades
 int entityCollision(struct entity* en1, struct entity* en2);
@@ -56,12 +59,14 @@ int entityDownCollision(struct entity* en1, struct entity* en2);
 int entityUpCollision(struct entity* en1, struct entity* en2);
 
 // Atualiza o estado de uma entidade qualquer
-void updateEntity(struct entity* en, struct tile** tiles);
+int updateEntity(struct entity* en, struct tile** tiles);
 
 // Atualiza o estado do personagem principal
-void updateCharacter(struct entity* character, struct tile** tiles, struct entityList* entities, unsigned char* key);
+struct tile* updateCharacter(struct entity* character, struct tile** tiles, unsigned char* key);
 
 // Libera o espaço de memória ocupado pela entidade
 void destroyEntity(struct entity* en);
+
+int gameUpdate(struct entity* character, struct tile** tiles, struct entityList* entities, unsigned char* key);
 
 #endif
