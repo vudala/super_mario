@@ -42,43 +42,61 @@ int specialTileContent(char type){
     return -1;
 }
 
+// Verifica se uma entidade está dentro dos limites do mapa
+int withinLimits(struct entity* en){
+    if(en->x < 0 || en->y < 0) return 0;
+    if(en->x + en->w - 1 >= MAP_WIDTH * TILE_WIDTH) return 0;
+    if(en->y + en->h - 1 >= MAP_HEIGHT * TILE_HEIGHT) return 0;
+    
+    return 1;
+}
+
 struct tile* tileLeftCollision(struct entity* en, struct tile** tiles){
+    // Se não estiver dentro dos limites
+    if(!withinLimits(en)) return NULL;
+
     if(en->dx < 0){
-        struct tile* left1 = pointToTile(en->x-1, en->y, tiles);
-        struct tile* left2 = pointToTile(en->x-1, en->y+en->h - 1, tiles);
-        if(!left1 || !left2) return 0; // Se for outbounds
+        struct tile* left1 = pointToTile(en->x, en->y, tiles);
+        struct tile* left2 = pointToTile(en->x, en->y + en->h - 1, tiles);
         if(left1->active || left2->active){
             en->dx = 0;
             en->x = left1->x+left1->w;
-            if(en->behavior != JUMPING) en->behavior = IDLE;
             if(left1->active) return left1;
             return left2;
         }
     }
+
     return NULL;
 }
 
 struct tile* tileRightCollision(struct entity* en, struct tile** tiles){
+    // Se não estiver dentro dos limites
+    if(!withinLimits(en)) return NULL;
+
     if(en->dx > 0){
+        
+
         struct tile* right1 = pointToTile(en->x+en->w, en->y, tiles);
         struct tile* right2 = pointToTile(en->x+en->w, en->y+en->h - 1, tiles);
-        if(!right1 || !right2) return 0; // Se for outbounds
         if(right1->active || right2->active){
             en->dx = 0;
             en->x = right1->x - right1->w;
-            if(en->behavior != JUMPING) en->behavior = IDLE;
             if(right1->active) return right1;
             return right2;
         }
     }
+
     return NULL;
 }
 
 
 struct tile* tileUpCollision(struct entity* en, struct tile** tiles){
+    // Se não estiver dentro dos limites
+    if(!withinLimits(en)) return NULL;
+
     struct tile* up1 = pointToTile(en->x + 5, en->y, tiles);
     struct tile* up2 = pointToTile(en->x+en->w - 5, en->y, tiles);
-    if(!up1 || !up2) return 0; // Se for outbounds
+
     if(up1->active || up2->active){
         en->dy = 0;
         en->y = up1->y + up1->h;
@@ -90,15 +108,16 @@ struct tile* tileUpCollision(struct entity* en, struct tile** tiles){
 }
 
 struct tile* tileDownCollision(struct entity* en, struct tile** tiles){
+    // Se não estiver dentro dos limites
+    if(!withinLimits(en)) return NULL;
+
     struct tile* down1 = pointToTile(en->x + 5, en->y+en->h, tiles);
     struct tile* down2 = pointToTile(en->x+en->w - 5, en->y+en->h, tiles);
-    if(!down1 || !down2) return 0; // Se for outbounds
+    
     if(down1->active || down2->active){
-        if(en->behavior == JUMPING){
-            en->behavior = IDLE;
-            en->dy = 0;
-            en->y = down1->y - en->h;
-        }
+        en->dy = 0;
+        en->y = down1->y - en->h;
+        
         if(down1->active) return down1;
         return down2;
     }
@@ -131,8 +150,10 @@ struct tile** loadLevel(char* levelPath, struct entityList* l, ALLEGRO_BITMAP***
                 width = al_get_bitmap_width(sprites[whichSprite][0]);
                 height = al_get_bitmap_height(sprites[whichSprite][0]);
                 insertEntity(l,
-                    newEntity(c, j*TILE_WIDTH, i*TILE_HEIGHT, width, height, RIGHT, JUMPING, 
-                        newAnimation(whichSprite, 2, FRAME_DURATION), -1)
+                    newEntity(c, j*TILE_WIDTH, i*TILE_HEIGHT, width, height, RIGHT, 
+                        newAnimation(whichSprite, 2, FRAME_DURATION),
+                        -1
+                    )
                 );
                 newT = newTile( j * TILE_WIDTH, i * TILE_HEIGHT, TILE_WIDTH, TILE_HEIGHT, 0, EMPTY_BLOCK);
                 t[i][j] = *newT;

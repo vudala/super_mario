@@ -21,7 +21,7 @@ int gameInit(){
     queue = al_create_event_queue();
     mustInit(queue, "queue");
 
-    disp = al_create_display(DISPLAY_WIDTH, DISPLAY_HEIGHT);
+    disp = al_create_display(VIRTUAL_WIDTH, VIRTUAL_HEIGHT);
     mustInit(disp, "display");
 
     font = al_create_builtin_font();
@@ -61,7 +61,7 @@ int gamePlay(int* score){
     struct entity* character = newEntity(MAIN_CHARACTER_SPRITE, 120, 510,
         al_get_bitmap_width(sprites[MAIN_CHARACTER_SPRITE][0]),
         al_get_bitmap_height(sprites[MAIN_CHARACTER_SPRITE][0]),
-        RIGHT, JUMPING, anim, -1);
+        RIGHT, anim, -1);
 
     int offset = 0;
 
@@ -82,7 +82,7 @@ int gamePlay(int* score){
                     done = true;
                 }
                 
-                offset = -(character->x - (DISPLAY_WIDTH / 2));
+                offset = -(character->x - (VIRTUAL_WIDTH / 2));
                
                 if(key[ALLEGRO_KEY_ESCAPE]) {
                     newState = DESTROY;

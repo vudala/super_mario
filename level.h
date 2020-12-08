@@ -1,6 +1,13 @@
 #ifndef LEVEL_INCLUDED
 #define LEVEL_INCLUDED
 
+#define MAP_WIDTH 337 // Quantas tiles tem na horizontal
+#define MAP_HEIGHT 16 // Quantas tiles tem na vertical
+#define TILE_WIDTH 40 // Largura de cada tile
+#define TILE_HEIGHT 40 // Altura de cada tile
+#define VIRTUAL_WIDTH (25 * TILE_WIDTH) // Tamanho horizontal da tela virtual
+#define VIRTUAL_HEIGHT (MAP_HEIGHT * TILE_HEIGHT) // Tamanho vertical da tela virtual
+
 typedef struct ALLEGRO_BITMAP ALLEGRO_BITMAP;
 struct entity;
 struct entityList;

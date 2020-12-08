@@ -212,7 +212,7 @@ void drawEntity(struct entity* en, int* offset, ALLEGRO_BITMAP*** sprites){
                 en->w * -1, en->h,
                 0);
             break;
-        case JUMPING:
+        case JUMPING: case BOUNCING:
             if(en->dir)
                 al_draw_bitmap(sprites[en->anim->whichSprite][JUMP_FRAME],
                 floor(*offset + en->x), floor(en->y),

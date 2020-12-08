@@ -8,9 +8,11 @@
 #define IDLE 0
 #define WALKING 1
 #define JUMPING 2
+#define BOUNCING 3
 #define LEFT 0
 #define RIGHT 1
 
+#define BOUNCE_VELOCITY -10.0
 #define JUMP_VELOCITY -15.0;
 #define GRAVITY 0.5
 #define PLAYER_WALKING_SPEED 4.0
@@ -29,6 +31,13 @@ typedef enum {
     COIN = 'C'
 } EntityTipe;
 
+typedef enum {
+    NO_POWER = 0,
+    MUSHROOM_POWER,
+    FLOWER_POWER,
+    STAR_POWER
+} Powers;
+
 struct entity {
     int type; // Tipo de entidade
     int x; // Posicao X
@@ -43,23 +52,24 @@ struct entity {
     /* A cada frame diminui o tempo de vida da entidade, utilizado para controlar as entidades
     temporarias */
     int lifeSpan;
+    int power; // Power up do personagem
     struct animation* anim; // Animação
 };
 
 // Cria uma nova entidade
-struct entity* newEntity(int type, int x, int y, int w, int h, int dir, int behavior, struct animation* anim, int lSpan);
+struct entity* newEntity(int type, int x, int y, int w, int h, int dir, struct animation* anim, int lSpan);
 
 // Checa colisão entre duas entidades
 int entityCollision(struct entity* en1, struct entity* en2);
 
 // Checa colisão entre duas entidades, uma para cada extremo
-int entityLeftCollision(struct entity* en1, struct entity* en2);
-int entityRightCollision(struct entity* en1, struct entity* en2);
 int entityDownCollision(struct entity* en1, struct entity* en2);
-int entityUpCollision(struct entity* en1, struct entity* en2);
+// int entityLeftCollision(struct entity* en1, struct entity* en2);
+// int entityRightCollision(struct entity* en1, struct entity* en2);
+// int entityUpCollision(struct entity* en1, struct entity* en2);
 
 // Atualiza o estado de uma entidade qualquer
-int updateEntity(struct entity* en, struct tile** tiles);
+void updateEntity(struct entity* en, struct tile** tiles);
 
 // Atualiza o estado do personagem principal
 struct tile* updateCharacter(struct entity* character, struct tile** tiles, unsigned char* key);
