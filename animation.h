@@ -15,7 +15,7 @@
 #define IDLE_FRAME 0 // Indice padrão do frame de IDLE
 #define JUMP_FRAME 1 // Indice padrão do frame de JUMPING
 
-#define ENTITY_SPRITES_N 10
+#define ENTITY_SPRITES_N 11
 typedef enum {
     CHAR_SPRITE = 0,
     SMALL_CHAR_SPRITE,
@@ -26,10 +26,11 @@ typedef enum {
     STAR_SPRITE,
     SHELL_SPRITE,
     MUSHROOM_SPRITE,
-    COIN_SPRITE
+    COIN_SPRITE,
+    FIREBALL_SPRITE
 } EntitySpritesID;
 
-#define TILES_SPRITES_N 9
+#define TILE_SPRITES_N 9
 typedef enum {
     EMPTY_BLOCK_SPRITE = 0,
     BRICK_BLOCK_SPRITE,
@@ -43,7 +44,7 @@ typedef enum {
 } TileSpritesID;
 
 struct animation {
-    int whichSprite; // ID da sprite que deve utilizar
+    int sprite; // ID da sprite que deve utilizar
     int currentClock; // Clock atual
     int currentFrame; // Frame atual
     int reset; // Se deve começar a resetar os frames
@@ -64,6 +65,9 @@ struct animation* newAnimation(int whichSprite);
 
 // Desenha uma entidade qualquer utilizando um deslocamento de câmera e uma cor
 void drawEntity(struct entity* en, int* offset, ALLEGRO_BITMAP*** sprites, ALLEGRO_COLOR color);
+
+// Desenha todas as entidades de uma lista de entidades
+void drawEntities(struct entityList* list, int* offset, ALLEGRO_BITMAP*** sprites, ALLEGRO_COLOR color);
 
 // Desenha as tiles
 void drawTiles(struct tile** tiles, ALLEGRO_BITMAP** sprites, int* offset);

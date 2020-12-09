@@ -30,7 +30,7 @@ ALLEGRO_BITMAP** loadEntitySprite(char* path){
 }
 
 ALLEGRO_BITMAP** loadTileSprites(){
-    ALLEGRO_BITMAP** sprites = calloc(TILES_SPRITES_N, sizeof(ALLEGRO_BITMAP*));
+    ALLEGRO_BITMAP** sprites = calloc(TILE_SPRITES_N, sizeof(ALLEGRO_BITMAP*));
     mustAllocate(sprites, "sprites");
 
     sprites[0] = al_load_bitmap("resources/sprites/tiles/brick.png");
@@ -69,10 +69,11 @@ ALLEGRO_BITMAP*** loadSprites(){
     sprites[SHELL_SPRITE] = loadEntitySprite("resources/sprites/entities/shell.png");
     sprites[MUSHROOM_SPRITE] = loadEntitySprite("resources/sprites/entities/mushroom.png");
     sprites[COIN_SPRITE] = loadEntitySprite("resources/sprites/entities/coin.png");
+    sprites[FIREBALL_SPRITE] = loadEntitySprite("resources/sprites/entities/fireball.png");
 
     return sprites;
 }
-
+ 
 int entitySpriteID(char type){
     switch(type){
         case MAIN_CHARACTER: return CHAR_SPRITE; break;
@@ -85,16 +86,17 @@ int entitySpriteID(char type){
         case SHELL: return SHELL_SPRITE; break;
         case MUSHROOM: return MUSHROOM_SPRITE; break;
         case COIN: return COIN_SPRITE; break;
+        case FIREBALL: return FIREBALL_SPRITE; break;
     }
 
     return MUSHROOM_SPRITE;
 }
 
-struct animation* newAnimation(int whichSprite){
+struct animation* newAnimation(int sprite){
     struct animation* a = calloc(1, sizeof(struct animation));
     mustAllocate(a, "animation");
 
-    a->whichSprite = whichSprite;
+    a->sprite = sprite;
     a->currentClock = FRAME_DURATION;
     a->currentFrame = IDLE_FRAME;
     a->reset = 0;
@@ -121,19 +123,28 @@ void drawEntity(struct entity* en, int* offset, ALLEGRO_BITMAP*** sprites, ALLEG
     int dw = en->dir ? 0 : en->w;
 
     // Seleciona qual frame deve desenhar
-    ALLEGRO_BITMAP* whichSprite = sprites[en->anim->whichSprite][IDLE_FRAME];
+    ALLEGRO_BITMAP* frame = sprites[en->anim->sprite][IDLE_FRAME];
     switch(en->behavior){
         case WALKING:
             updateWalkFrame(en);
-            whichSprite = sprites[en->anim->whichSprite][en->anim->currentFrame];
+            frame = sprites[en->anim->sprite][en->anim->currentFrame];
             break;
         case JUMPING: case BOUNCING:
-            whichSprite = sprites[en->anim->whichSprite][JUMPING];
+            frame = sprites[en->anim->sprite][JUMPING];
             break;
     }
-    al_draw_tinted_scaled_bitmap(whichSprite, color, 0, 0, en->w, en->h,
+
+    al_draw_tinted_scaled_bitmap(frame, color, 0, 0, en->w, en->h,
     floor(*offset + en->x) + dw, floor(en->y),
     en->w * xScale, en->h, 0);
+}
+
+void drawEntities(struct entityList* list, int* offset, ALLEGRO_BITMAP*** sprites, ALLEGRO_COLOR color){
+    struct entityNode* next = list->start;
+    while(next != NULL){
+        drawEntity(next->en, offset, sprites, color);
+        next = next->next;
+    }
 }
 
 int tileSpriteID(char type){

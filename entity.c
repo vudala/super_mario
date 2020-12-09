@@ -18,7 +18,7 @@ int whichBehavior(int enType){
     if(enType == FLOWER || enType == COIN || enType == SHELL)
         behavior = IDLE;
     // Se for estrela, nasce quicando
-    else if(enType == STAR)
+    else if(enType == STAR || enType == FIREBALL)
         behavior = BOUNCING;
 
     return behavior;
@@ -40,8 +40,6 @@ struct entity* newEntity(int type, int x, int y, int w, int h, int dir, struct a
     en->anim = anim;
     en->life = 1;
     en->lifeSpan = lSpan;
-    // en->power = NO_POWER; // Começa sem poderes
-    // en->invincibility = 0; // Começa sem invencibilidade
    
     return en;
 }
@@ -65,34 +63,78 @@ int entityDownCollision(struct entity* en1, struct entity* en2){
 
 
 int isDead(struct entity* en){
-    if(en->y > MAP_HEIGHT * TILE_HEIGHT)
+    if(en->lifeSpan == 0 || en->life == 0)
         return 1;
-    if(en->x < 0)
+    if(!withinMapHeight(en) || !withinMapWidth(en))
         return 1;
-    if(en->lifeSpan == 0 || en->life == 0) return 1;
+
     return 0;
+}
+
+void addFireball(struct entityList* fireballs, struct entity* en, ALLEGRO_BITMAP*** sprites){
+    // Onde irá nascer no eixo X
+    int whichX = en->dir ? en->x + en->w : en->x - 1;
+    int w = al_get_bitmap_width(sprites[FIREBALL_SPRITE][0]);
+    int h = al_get_bitmap_height(sprites[FIREBALL_SPRITE][0]);
+    struct entity* newFireball = newEntity(FIREBALL, whichX, floor(en->y + (en->w / 2)),
+                                    w, h, en->dir, newAnimation(FIREBALL_SPRITE), 120
+                                );
+    insertEntity(fireballs, newFireball);
+}
+
+int fireballHit(struct entityList* fireballs, struct entity* en){
+    struct entityNode* current = NULL;
+    struct entityNode* next = fireballs->start; 
+
+    while(next != NULL){
+        current = next;
+        next = current->next;
+        // Se uma fireball bateu em um goomba ou uma turtle
+        // Remove a fireball e retorna true
+        if(entityCollision(current->en, en) && (en->type == GOOMBA || en->type == TURTLE)){
+            removeEntity(current->id, fireballs);
+            return 1;
+        }
+    }
+
+    return 0;
+}
+
+void fireballsUpdate(struct entityList* fireballs, struct tile** tiles){
+    struct entityNode* current = NULL;
+    struct entityNode* next = fireballs->start; 
+
+    while(next != NULL){
+        current = next;
+        next = current->next;
+        updateEntity(current->en, tiles);
+        if(isDead(current->en))
+            removeEntity(current->id, fireballs);
+    }
 }
 
 void updateEntity(struct entity* en, struct tile** tiles){
     en->lifeSpan -= 1;
-
+    int whichSpeed = en->type == FIREBALL ? FIREBALL_SPEED : ENTITY_SPEED;
     switch(en->behavior){
         case BOUNCING:
-            if(en->dir) en->dx = MONSTER_WALKING_SPEED;
-            else en->dx = -MONSTER_WALKING_SPEED;
+            if(en->dir) en->dx = whichSpeed;
+            else en->dx = -whichSpeed;
 
             en->dy += GRAVITY;
 
-            if(tileDownCollision(en, tiles)) en->dy = BOUNCE_VELOCITY;
-            tileUpCollision(en, tiles);
+            if(tileDownCollision(en, tiles)) 
+                en->dy = en->type == FIREBALL ? FIREBALL_BOUNCE : ENTITY_BOUNCE;
 
+            tileUpCollision(en, tiles);
             // Se bateu em algo troca de direção
             if(tileLeftCollision(en, tiles)) en->dir = RIGHT;
             if(tileRightCollision(en, tiles)) en->dir = LEFT;
+
             break;
         case JUMPING:
-            if(en->dir) en->dx = MONSTER_WALKING_SPEED;
-            else en->dx = -MONSTER_WALKING_SPEED;
+            if(en->dir) en->dx = whichSpeed;
+            else en->dx = -whichSpeed;
 
             en->dy += GRAVITY;
             
@@ -104,13 +146,15 @@ void updateEntity(struct entity* en, struct tile** tiles){
 
             break;
         case WALKING:
-            if(en->dir) en->dx = MONSTER_WALKING_SPEED;
-            else en->dx = -MONSTER_WALKING_SPEED;
+            if(en->dir) en->dx = whichSpeed;
+            else en->dx = -whichSpeed;
+
             // Se não houver tiles embaixo
             if(!tileDownCollision(en, tiles)) en->behavior = JUMPING;
             // Se bateu em algo troca de direção
             if(tileLeftCollision(en, tiles)) en->dir = RIGHT;
             if(tileRightCollision(en, tiles)) en->dir = LEFT;
+
             break;
     }
     

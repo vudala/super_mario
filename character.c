@@ -18,25 +18,25 @@ struct tile* updateCharacter(struct character* character, struct tile** tiles, u
     if(character->invincibility == 0) character->star = 0;
 
     switch(character->self->behavior){
-        case IDLE:
+        case IDLE:  
             if (key[ALLEGRO_KEY_SPACE]){ // Pula
                 character->self->dy = JUMP_VELOCITY;
                 character->self->behavior = JUMPING;
-            } else
-            if (key[ALLEGRO_KEY_LEFT]){ // Anda pra esquerda
+            }
+            else if (key[ALLEGRO_KEY_LEFT]){ // Anda pra esquerda
                 character->self->dir = LEFT;
-                character->self->dx = -PLAYER_WALKING_SPEED;
+                character->self->dx = -CHARACTER_SPEED;
                 character->self->behavior = WALKING;
-            } else
-            if (key[ALLEGRO_KEY_RIGHT]) { // Anda pra direita
+            } 
+            else if (key[ALLEGRO_KEY_RIGHT]) { // Anda pra direita
                 character->self->dir = RIGHT;
-                character->self->dx = PLAYER_WALKING_SPEED;
+                character->self->dx = CHARACTER_SPEED;
                 character->self->behavior = WALKING;
-            } else
+            } 
+            else
                 character->self->dx = 0; // Para de acelerar
             
             tileUpCollision(character->self, tiles);
-
             // Se colidiu lateralmente
             if(tileLeftCollision(character->self, tiles) || tileRightCollision(character->self, tiles))
                 character->self->behavior = IDLE;
@@ -45,12 +45,14 @@ struct tile* updateCharacter(struct character* character, struct tile** tiles, u
         case JUMPING:
             if(key[ALLEGRO_KEY_LEFT]){ // Se move para a esquerda
                 character->self->dir = LEFT;
-                character->self->dx = -PLAYER_WALKING_SPEED;
-            } else
-            if(key[ALLEGRO_KEY_RIGHT]){ // Se move para a direita
+                character->self->dx = -CHARACTER_SPEED;
+            } 
+            else if(key[ALLEGRO_KEY_RIGHT]){ // Se move para a direita
                 character->self->dir = RIGHT;
-                character->self->dx = PLAYER_WALKING_SPEED;
-            } else character->self->dx = 0; // Para de acelerar
+                character->self->dx = CHARACTER_SPEED;
+            } 
+            else
+                character->self->dx = 0; // Para de acelerar
             
             character->self->dy += GRAVITY; // É puxado pela gravidade
             
@@ -75,14 +77,14 @@ struct tile* updateCharacter(struct character* character, struct tile** tiles, u
             if (key[ALLEGRO_KEY_SPACE]) { // Pula 
                 character->self->dy = JUMP_VELOCITY;
                 character->self->behavior = JUMPING;
-            } else
-            if (key[ALLEGRO_KEY_LEFT]) { // Anda a esquerda
+            } 
+            else if (key[ALLEGRO_KEY_LEFT]) { // Anda a esquerda
                 character->self->dir = LEFT;
-                character->self->dx = -PLAYER_WALKING_SPEED;
-            } else
-            if (key[ALLEGRO_KEY_RIGHT]) { // Anda a direita
+                character->self->dx = -CHARACTER_SPEED;
+            } 
+            else if (key[ALLEGRO_KEY_RIGHT]) { // Anda a direita
                 character->self->dir = RIGHT;
-                character->self->dx = PLAYER_WALKING_SPEED;
+                character->self->dx = CHARACTER_SPEED;
             } else { // Para
                 character->self->dx = 0;
                 character->self->behavior = IDLE;
@@ -136,12 +138,23 @@ struct entity* tilesInteract(struct character* character, struct tile** tiles, u
 
 void givePower(struct character* character, int powerType){
     switch(powerType){
-        case MUSHROOM_POWER: case FLOWER_POWER:
-            if(!character->power){
-                character->power = powerType == MUSHROOM_POWER ? MUSHROOM_POWER : FLOWER_POWER;
+        case MUSHROOM_POWER:
+            if(character->power == NO_POWER){
                 character->self->w = BIG_WIDTH;
                 character->self->h = BIG_HEIGHT;
-                character->self->anim->whichSprite = powerType == MUSHROOM_POWER ? CHAR_SPRITE : CHAR_FLOWER_SPRITE;
+                character->power = MUSHROOM_POWER;
+                character->self->anim->sprite = CHAR_SPRITE;
+                character->self->behavior = JUMPING;
+            }
+            //else
+                //*score += 100;
+            break; 
+        case FLOWER_POWER:
+            if(character->power != FLOWER_POWER){
+                character->self->w = BIG_WIDTH;
+                character->self->h = BIG_HEIGHT;
+                character->power = FLOWER_POWER;
+                character->self->anim->sprite = CHAR_FLOWER_SPRITE;
                 character->self->behavior = JUMPING;
             }
             //else
@@ -156,13 +169,16 @@ void givePower(struct character* character, int powerType){
             character->power = NO_POWER;
             character->self->w = SMALL_WIDTH;
             character->self->h = SMALL_HEIGHT;
-            character->self->anim->whichSprite = SMALL_CHAR_SPRITE;
+            character->self->anim->sprite = SMALL_CHAR_SPRITE;
             character->self->behavior = JUMPING;
             break;
     }
 }
 
-int entitiesInteract(struct character* character, struct tile** tiles, struct entityList* entities){
+int entitiesInteract(struct character* character, struct tile** tiles, struct entityList* entities,
+struct entityList* fireballs){
+    fireballsUpdate(fireballs, tiles);
+
     struct entityNode* current = NULL;
     struct entityNode* next = entities->start; 
 
@@ -171,7 +187,10 @@ int entitiesInteract(struct character* character, struct tile** tiles, struct en
         current = next;
         next = current->next;
         // Se ela morreu, a remove
-        if(isDead(current->en)) removeEntity(current->id, entities);
+        if(isDead(current->en)) 
+            removeEntity(current->id, entities);
+        else if(fireballHit(fireballs, current->en))
+            removeEntity(current->id, entities);
         else {
             updateEntity(current->en, tiles);
             if(entityCollision(character->self, current->en))
@@ -190,11 +209,11 @@ int entitiesInteract(struct character* character, struct tile** tiles, struct en
                         // Se pular em cima dele, o fere
                         if(entityDownCollision(character->self, current->en)){
                             removeEntity(current->id, entities);
-                            character->self->dy = BOUNCE_VELOCITY;
+                            character->self->dy = ENTITY_BOUNCE;
                             character->self->behavior = JUMPING;
                             break;
                         }  // Se não, significa que encostou em um inimigo
-                        else if (character->invincibility > 0){ // Se estiver invencivel
+                        else if (character->invincibility > 0){ // Se estiver invencivel não toma hit
                             // E se tiver sob o poder da estrela, mata o inimigo
                             if(character->star)
                                 removeEntity(current->id, entities);
@@ -203,8 +222,9 @@ int entitiesInteract(struct character* character, struct tile** tiles, struct en
                             // Se tiver poder, perde o poder e fica brevemente invulnerável
                             character->invincibility = HIT_SPAN;
                             givePower(character, NO_POWER);
-                        }  
-                        else return 1; // Se não, morre
+                        }
+                        else  // Se não, morre
+                            return 1;
                             
                         break;
                 }
@@ -212,12 +232,4 @@ int entitiesInteract(struct character* character, struct tile** tiles, struct en
     }
 
     return 0;
-}
-
-int gameUpdate(struct character* character, struct tile** tiles, struct entityList* entities, unsigned char* key){
-    struct entity* newEn = tilesInteract(character, tiles, key);
-    if(newEn) insertEntity(entities, newEn);
-    newEn = NULL;
-
-    return entitiesInteract(character, tiles, entities);
 }

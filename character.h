@@ -9,6 +9,9 @@
 #define BIG_WIDTH 40 // Largura do personagem grande
 #define BIG_HEIGHT 60 // Altura do personagem grande 
 
+#define CHARACTER_SPEED 4.0
+#define JUMP_VELOCITY -15.0;
+
 struct character {
     struct entity* self;
     int power; // Power up do personagem
@@ -22,9 +25,9 @@ struct character* newCharacter(struct entity* en);
 // Atualiza os atributos do personagem, com base em inputs e estados atributos anteriores
 struct tile* updateCharacter(struct character* character, struct tile** tiles, unsigned char* key);
 
-int gameUpdate(struct character* character, struct tile** tiles, struct entityList* entities, unsigned char* key);
+int entitiesInteract(struct character* character, struct tile** tiles, struct entityList* entities,
+struct entityList* fireballs);
 
-
-
+struct entity* tilesInteract(struct character* character, struct tile** tiles, unsigned char* key);
 
 #endif

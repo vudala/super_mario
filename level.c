@@ -54,7 +54,7 @@ int withinMapWidth(struct entity* en){
 // Verifica se uma entidade está dentro dos limites de altura do mapa
 int withinMapHeight(struct entity* en){
     if(en->x < 0 || en->y < 0) return 0;
-    if(en->y + en->h - 1 >= MAP_HEIGHT * TILE_HEIGHT) return 0;
+    if(en->y + en->h >= MAP_HEIGHT * TILE_HEIGHT) return 0;
     
     return 1;
 }
@@ -119,8 +119,8 @@ struct tile* tileDownCollision(struct entity* en, struct tile** tiles){
     // Se não estiver dentro dos limites
     if(!withinMapHeight(en)) return NULL;
 
-    struct tile* down1 = pointToTile(en->x + 5, en->y+en->h, tiles);
-    struct tile* down2 = pointToTile(en->x+en->w - 5, en->y+en->h, tiles);
+    struct tile* down1 = pointToTile(en->x + 5, en->y + en->h, tiles);
+    struct tile* down2 = pointToTile(en->x+en->w - 5, en->y + en->h, tiles);
     
     if(down1->active || down2->active){
         en->dy = 0;

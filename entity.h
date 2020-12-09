@@ -5,18 +5,23 @@
 #include "entity_list.h"
 #include "animation.h"
 
-#define IDLE 0
-#define WALKING 1
-#define JUMPING 2
-#define BOUNCING 3
-#define LEFT 0
-#define RIGHT 1
+typedef enum {
+    IDLE = 0,
+    WALKING,
+    JUMPING,
+    BOUNCING
+} Behaviors;
 
-#define BOUNCE_VELOCITY -10.0
-#define JUMP_VELOCITY -15.0;
+#define LEFT 0 // Aponta para a esquerda
+#define RIGHT 1 // Aponta para a direita
+
 #define GRAVITY 0.5
-#define PLAYER_WALKING_SPEED 4.0
-#define MONSTER_WALKING_SPEED 2.0
+
+#define FIREBALL_BOUNCE -5.0
+#define FIREBALL_SPEED 4.0
+
+#define ENTITY_BOUNCE -10.0
+#define ENTITY_SPEED 1.0
 
 typedef enum {
     MAIN_CHARACTER = 'X',
@@ -28,7 +33,8 @@ typedef enum {
     STAR = 'S',
     SHELL = 'D',
     MUSHROOM = 'M',
-    COIN = 'C'
+    COIN = 'C',
+    FIREBALL = 'B'
 } EntityTipe;
 
 typedef enum {
@@ -64,6 +70,15 @@ struct entity* newEntity(int type, int x, int y, int w, int h, int dir, struct a
 
 // Verifica se uma entidade está morta
 int isDead(struct entity* en);
+
+// Adiciona uma fireball a frente de en
+void addFireball(struct entityList* fireballs, struct entity* en, ALLEGRO_BITMAP*** sprites);
+
+// Verifica se alguma fireball bateu na entidade
+int fireballHit(struct entityList* fireballs, struct entity* en);
+
+// Atualiza o estado e posição das fireballs
+void fireballsUpdate(struct entityList* fireballs, struct tile** tiles);
 
 // Checa colisão entre duas entidades
 int entityCollision(struct entity* en1, struct entity* en2);

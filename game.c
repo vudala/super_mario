@@ -66,6 +66,10 @@ int gamePlay(int* score){
     mustInit(entities, "entities");
     createList(entities);
 
+    struct entityList* fireballs = malloc(sizeof(struct entityList));
+    mustInit(fireballs, "fireballs");
+    createList(fireballs);
+
     struct tile** tiles = loadLevel("resources/database/level.txt", entities, sprites);
     
     struct character* character = newCharacter(newEntity(MAIN_SMALL, 120, 510,
@@ -75,10 +79,12 @@ int gamePlay(int* score){
         
 
     int offset = 0;
-
+    struct entity* newEn = NULL;
     bool done = false;
     int newState = DESTROY;
     bool redraw = true;
+    int skillCooldown = 30; // Tempo de recarga da fireball
+    int currClock = 0; // Quanto tempo resta até poder ser possivel lançar outra
     
     for(;;)
     {
@@ -87,8 +93,20 @@ int gamePlay(int* score){
         switch(event.type)
         {
             case ALLEGRO_EVENT_TIMER:
+
+                if (key[ALLEGRO_KEY_J] && currClock < 1 && character->power == FLOWER_POWER){
+                    currClock = skillCooldown;
+                    addFireball(fireballs, character->self, sprites);
+                }
+                currClock -= 1;
+                
+                newEn = tilesInteract(character, tiles, key);
+                if(newEn) insertEntity(entities, newEn);
+
+                entitiesInteract(character, tiles, entities, fireballs);
+
                 // Se colidiu com outra entidade inimiga sem matá-la, termina o jogo
-                if(gameUpdate(character, tiles, entities, key)){
+                if(entitiesInteract(character, tiles, entities, fireballs)){
                     newState = ENDING;
                     done = true;
                 }
@@ -123,31 +141,22 @@ int gamePlay(int* score){
         if(redraw && al_is_event_queue_empty(queue))
         {
             al_clear_to_color(al_map_rgb(127, 127, 127));
-            
-            if(character->power == MUSHROOM_POWER)
-                al_draw_text(font, al_map_rgb(255, 0, 0), 300, 10, 0, "MUSHROOM_POWER");
-            if(character->power == FLOWER_POWER)
-                al_draw_text(font, al_map_rgb(255, 0, 0), 300, 10, 0, "FLOWER_POWER");
-            if(character->star)
-                al_draw_text(font, al_map_rgb(255, 0, 0), 300, 30, 0, "STAR_POWER");
-            if(character->power == NO_POWER)
-                al_draw_text(font, al_map_rgb(255, 0, 0), 300, 10, 0, "NO_POWER");
 
-             // Pinta de branco não interfere na cor
-            ALLEGRO_COLOR color = al_map_rgb(255,255,255);
             // Desenha o mapa
             drawTiles(tiles, tileSprites, &offset);
-            struct entityNode* next = entities->start;
-            while(next != NULL){
-                drawEntity(next->en, &offset, sprites, color);
-                next = next->next;
-            }
+
+            // Pintar de branco não interfere na cor
+            ALLEGRO_COLOR color = al_map_rgb(255,255,255);
+
+            // Desenha as diversas entidades
+            drawEntities(fireballs, &offset, sprites, color);
+            drawEntities(entities, &offset, sprites, color);
+
             // Desenha o personagem principal
-            if(character->star) // Se estiver no modo estrela, fica piscando em cores aleatórias
+            if(character->star) // Se estiver no modo estrela, desenha em cores aleatórias
                 color = al_map_rgb(rand() % RGB_MAX, rand() % RGB_MAX, rand() % RGB_MAX);
                 
             drawEntity(character->self, &offset, sprites, color);
-            // Desenha todas as outras entidades
             
             al_flip_display();
             redraw = false;
