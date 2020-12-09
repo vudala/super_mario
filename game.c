@@ -4,6 +4,7 @@
 #include "animation.h"
 #include "entity_list.h"
 #include "utils.h"
+#include "character.h"
 
 #include <stdio.h>
 
@@ -14,6 +15,8 @@ int gameInit(){
     mustInit(al_install_audio(), "audio");
     mustInit(al_init_acodec_addon(), "audio codecs");
     mustInit(al_reserve_samples(16), "reserve samples");
+
+    srand((unsigned) time(NULL));
 
     timer = al_create_timer(1.0 / FPS);
     mustInit(timer, "timer");
@@ -38,11 +41,11 @@ int gameInit(){
     return PLAY;
 }
 
-void updateCameraOffset(int* offset, struct entity* character){
-    *offset = -(character->x - (VIRTUAL_WIDTH / 2));
+void updateCameraOffset(int* offset, struct character* character){
+    *offset = -(character->self->x - (VIRTUAL_WIDTH / 2));
     if(*offset > -TILE_WIDTH)
         *offset = -TILE_WIDTH;
-    else if (character->x + (VIRTUAL_WIDTH / 2) > (TILE_WIDTH)* (MAP_WIDTH - 1))
+    else if (character->self->x + (VIRTUAL_WIDTH / 2) > (TILE_WIDTH)* (MAP_WIDTH - 1))
         *offset = -(TILE_WIDTH * (MAP_WIDTH - 1) - VIRTUAL_WIDTH);
 }
 
@@ -65,10 +68,11 @@ int gamePlay(int* score){
 
     struct tile** tiles = loadLevel("resources/database/level.txt", entities, sprites);
     
-    struct entity* character = newEntity(MAIN_SMALL, 120, 510,
+    struct character* character = newCharacter(newEntity(MAIN_SMALL, 120, 510,
         SMALL_WIDTH,
         SMALL_HEIGHT,
-        RIGHT, newAnimation(SMALL_CHAR_SPRITE), -1);
+        RIGHT, newAnimation(SMALL_CHAR_SPRITE), -1));
+        
 
     int offset = 0;
 
@@ -124,21 +128,27 @@ int gamePlay(int* score){
                 al_draw_text(font, al_map_rgb(255, 0, 0), 300, 10, 0, "MUSHROOM_POWER");
             if(character->power == FLOWER_POWER)
                 al_draw_text(font, al_map_rgb(255, 0, 0), 300, 10, 0, "FLOWER_POWER");
-            if(character->power == STAR_POWER)
-                al_draw_text(font, al_map_rgb(255, 0, 0), 300, 10, 0, "STAR_POWER");
+            if(character->star)
+                al_draw_text(font, al_map_rgb(255, 0, 0), 300, 30, 0, "STAR_POWER");
             if(character->power == NO_POWER)
                 al_draw_text(font, al_map_rgb(255, 0, 0), 300, 10, 0, "NO_POWER");
 
+             // Pinta de branco não interfere na cor
+            ALLEGRO_COLOR color = al_map_rgb(255,255,255);
             // Desenha o mapa
             drawTiles(tiles, tileSprites, &offset);
-            // Desenha o personagem principal
-            drawEntity(character, &offset, sprites);
-            // Desenha todas as outras entidades
             struct entityNode* next = entities->start;
             while(next != NULL){
-                drawEntity(next->en, &offset, sprites);
+                drawEntity(next->en, &offset, sprites, color);
                 next = next->next;
             }
+            // Desenha o personagem principal
+            if(character->star) // Se estiver no modo estrela, fica piscando em cores aleatórias
+                color = al_map_rgb(rand() % RGB_MAX, rand() % RGB_MAX, rand() % RGB_MAX);
+                
+            drawEntity(character->self, &offset, sprites, color);
+            // Desenha todas as outras entidades
+            
             al_flip_display();
             redraw = false;
         }
@@ -151,12 +161,12 @@ int gamePlay(int* score){
     free(tileSprites);
     free(tiles[0]);
     free(tiles);
-    destroyEntity(character);
+    destroyEntity(character->self);
     destroyList(entities);
     
-    // for(int i = 0; i < ENTITY_SPRITES_N; i++)
-    //     for(int j = 0; j < FRAMES_N; j++)
-    //         al_destroy_bitmap(sprites[i][j]);
+    for(int i = 0; i < ENTITY_SPRITES_N; i++)
+        for(int j = 0; j < FRAMES_N; j++)
+            al_destroy_bitmap(sprites[i][j]);
 
     return newState;
 }
@@ -262,11 +272,9 @@ int gameEnding(int* score){
     return newState;
 }
 
-int gameDestroy(){
+void gameDestroy(){
     al_destroy_display(disp);
     al_destroy_font(font);
     al_destroy_timer(timer);
     al_destroy_event_queue(queue);
-
-    exit(0);
 }

@@ -6,6 +6,8 @@
 #include "level.h"
 #include "entity_list.h"
 
+#define RGB_MAX 255
+
 #define FRAMES_N 5 // Quantos frames tem uma sprite
 #define FRAME_DURATION 10 // Duração padrão de cada frame da animação
 #define WALK_START 2 // Indice do primeiro frame de walk
@@ -13,7 +15,7 @@
 #define IDLE_FRAME 0 // Indice padrão do frame de IDLE
 #define JUMP_FRAME 1 // Indice padrão do frame de JUMPING
 
-#define ENTITY_SPRITES_N 9
+#define ENTITY_SPRITES_N 10
 typedef enum {
     CHAR_SPRITE = 0,
     SMALL_CHAR_SPRITE,
@@ -60,8 +62,8 @@ int tileSpriteID(char type);
 // Cria um conjunto de atributos utilizados para fazer uma animação
 struct animation* newAnimation(int whichSprite);
 
-// Desenha uma entidade qualquer utilizando um deslocamento de câmera
-void drawEntity(struct entity* en, int* offset, ALLEGRO_BITMAP*** sprites);
+// Desenha uma entidade qualquer utilizando um deslocamento de câmera e uma cor
+void drawEntity(struct entity* en, int* offset, ALLEGRO_BITMAP*** sprites, ALLEGRO_COLOR color);
 
 // Desenha as tiles
 void drawTiles(struct tile** tiles, ALLEGRO_BITMAP** sprites, int* offset);

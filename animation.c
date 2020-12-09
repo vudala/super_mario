@@ -21,9 +21,11 @@ ALLEGRO_BITMAP** loadEntitySprite(char* path){
     for(int i = 0; i < FRAMES_N; i++){
         subBitmap = al_create_sub_bitmap(mainBitmap, i * frameWidth, 0, frameWidth, height);
         mustAllocate(subBitmap, path);
-        sprites[i] = subBitmap;
+        sprites[i] = al_clone_bitmap(subBitmap);
     }
 
+    al_destroy_bitmap(mainBitmap);
+    
     return sprites;
 }
 
@@ -112,49 +114,26 @@ void updateWalkFrame(struct entity* en){
     } else en->anim->currentClock -= 1;
 }
 
-void drawEntity(struct entity* en, int* offset, ALLEGRO_BITMAP*** sprites){
+void drawEntity(struct entity* en, int* offset, ALLEGRO_BITMAP*** sprites, ALLEGRO_COLOR color){
+    // Se estiver virado pra direita desenha normalmente, se não irá desenhar ao contrário
+    int xScale = en->dir ? 1 : -1;
+    // Deslocamento do desenho
+    int dw = en->dir ? 0 : en->w;
+
+    // Seleciona qual frame deve desenhar
+    ALLEGRO_BITMAP* whichSprite = sprites[en->anim->whichSprite][IDLE_FRAME];
     switch(en->behavior){
-        case IDLE:
-            if(en->dir)
-                al_draw_bitmap(sprites[en->anim->whichSprite][IDLE_FRAME],
-                floor(*offset + en->x), floor(en->y),
-                0);
-            else
-                al_draw_scaled_bitmap(sprites[en->anim->whichSprite][IDLE_FRAME],
-                0, 0,
-                en->w, en->h,
-                floor(*offset + en->x) + en->w, floor(en->y),
-                en->w * -1, en->h,
-                0);
-            break;
         case WALKING:
             updateWalkFrame(en);
-            if(en->dir)
-                al_draw_bitmap(sprites[en->anim->whichSprite][en->anim->currentFrame],
-                floor(*offset + en->x), floor(en->y),
-                0);
-            else
-                al_draw_scaled_bitmap(sprites[en->anim->whichSprite][en->anim->currentFrame],
-                0, 0,
-                en->w, en->h,
-                floor(*offset + en->x) + en->w, floor(en->y),
-                en->w * -1, en->h,
-                0);
+            whichSprite = sprites[en->anim->whichSprite][en->anim->currentFrame];
             break;
         case JUMPING: case BOUNCING:
-            if(en->dir)
-                al_draw_bitmap(sprites[en->anim->whichSprite][JUMP_FRAME],
-                floor(*offset + en->x), floor(en->y),
-                0);
-            else
-                al_draw_scaled_bitmap(sprites[en->anim->whichSprite][JUMP_FRAME],
-                0, 0,
-                en->w, en->h,
-                floor(*offset + en->x) + en->w, floor(en->y),
-                en->w * -1, en->h,
-                0);
+            whichSprite = sprites[en->anim->whichSprite][JUMPING];
             break;
     }
+    al_draw_tinted_scaled_bitmap(whichSprite, color, 0, 0, en->w, en->h,
+    floor(*offset + en->x) + dw, floor(en->y),
+    en->w * xScale, en->h, 0);
 }
 
 int tileSpriteID(char type){

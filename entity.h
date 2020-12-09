@@ -18,11 +18,6 @@
 #define PLAYER_WALKING_SPEED 4.0
 #define MONSTER_WALKING_SPEED 2.0
 
-#define SMALL_WIDTH 40 // Largura do personagem pequeno
-#define SMALL_HEIGHT 48 // Altura do personagem pequeno
-#define BIG_WIDTH 40 // Largura do personagem grande
-#define BIG_HEIGHT 60 // Altura do personagem grande 
-
 typedef enum {
     MAIN_CHARACTER = 'X',
     MAIN_SMALL = 'x',
@@ -61,13 +56,14 @@ struct entity {
     /* A cada frame diminui o tempo de vida da entidade, utilizado para controlar as entidades
     temporarias */
     int lifeSpan;
-    int power; // Power up do personagem
-    int invincibility; // Por quantos frames a entidade ficará invencível
     struct animation* anim; // Animação
 };
 
 // Cria uma nova entidade
 struct entity* newEntity(int type, int x, int y, int w, int h, int dir, struct animation* anim, int lSpan);
+
+// Verifica se uma entidade está morta
+int isDead(struct entity* en);
 
 // Checa colisão entre duas entidades
 int entityCollision(struct entity* en1, struct entity* en2);
@@ -78,12 +74,8 @@ int entityDownCollision(struct entity* en1, struct entity* en2);
 // Atualiza o estado de uma entidade qualquer
 void updateEntity(struct entity* en, struct tile** tiles);
 
-// Atualiza o estado do personagem principal
-struct tile* updateCharacter(struct entity* character, struct tile** tiles, unsigned char* key);
-
 // Libera o espaço de memória ocupado pela entidade
 void destroyEntity(struct entity* en);
 
-int gameUpdate(struct entity* character, struct tile** tiles, struct entityList* entities, unsigned char* key);
 
 #endif
