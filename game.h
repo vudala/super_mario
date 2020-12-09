@@ -30,8 +30,11 @@ typedef enum {
 } GameStates;
 
 int gameInit();
+
 int gamePlay(int* score);
+
 int gameEnding(int* score);
+
 int gameDestroy();
 
 #endif

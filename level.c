@@ -20,6 +20,7 @@ struct tile* newTile(int x, int y, int w, int h, int active, int type){
     t->h = h;
     t->active = active;
     t->type = type;
+    t->content = type == COIN_BLOCK ? 3 : 1;
 
     return t;
 }
@@ -42,10 +43,17 @@ int specialTileContent(char type){
     return -1;
 }
 
-// Verifica se uma entidade está dentro dos limites do mapa
-int withinLimits(struct entity* en){
+// Verifica se uma entidade está dentro dos limites de largura do mapa
+int withinMapWidth(struct entity* en){
+    if(en->x < 0) return 0;
+    if(en->x + en->w - 1  >= MAP_WIDTH * TILE_WIDTH) return 0;
+    
+    return 1;
+}
+
+// Verifica se uma entidade está dentro dos limites de altura do mapa
+int withinMapHeight(struct entity* en){
     if(en->x < 0 || en->y < 0) return 0;
-    if(en->x + en->w - 1 >= MAP_WIDTH * TILE_WIDTH) return 0;
     if(en->y + en->h - 1 >= MAP_HEIGHT * TILE_HEIGHT) return 0;
     
     return 1;
@@ -53,11 +61,12 @@ int withinLimits(struct entity* en){
 
 struct tile* tileLeftCollision(struct entity* en, struct tile** tiles){
     // Se não estiver dentro dos limites
-    if(!withinLimits(en)) return NULL;
+    if(!withinMapWidth(en)) return NULL;
+    if(!withinMapHeight(en)) return NULL;
 
     if(en->dx < 0){
-        struct tile* left1 = pointToTile(en->x, en->y, tiles);
-        struct tile* left2 = pointToTile(en->x, en->y + en->h - 1, tiles);
+        struct tile* left1 = pointToTile(en->x - 1, en->y, tiles);
+        struct tile* left2 = pointToTile(en->x - 1, en->y + en->h - 1, tiles);
         if(left1->active || left2->active){
             en->dx = 0;
             en->x = left1->x+left1->w;
@@ -65,19 +74,18 @@ struct tile* tileLeftCollision(struct entity* en, struct tile** tiles){
             return left2;
         }
     }
-
+    
     return NULL;
 }
 
 struct tile* tileRightCollision(struct entity* en, struct tile** tiles){
     // Se não estiver dentro dos limites
-    if(!withinLimits(en)) return NULL;
+    if(!withinMapWidth(en)) return NULL;
+    if(!withinMapHeight(en)) return NULL;
 
     if(en->dx > 0){
-        
-
-        struct tile* right1 = pointToTile(en->x+en->w, en->y, tiles);
-        struct tile* right2 = pointToTile(en->x+en->w, en->y+en->h - 1, tiles);
+         struct tile* right1 = pointToTile(en->x + en->w, en->y, tiles);
+        struct tile* right2 = pointToTile(en->x + en->w, en->y+en->h - 1, tiles);
         if(right1->active || right2->active){
             en->dx = 0;
             en->x = right1->x - right1->w;
@@ -92,7 +100,7 @@ struct tile* tileRightCollision(struct entity* en, struct tile** tiles){
 
 struct tile* tileUpCollision(struct entity* en, struct tile** tiles){
     // Se não estiver dentro dos limites
-    if(!withinLimits(en)) return NULL;
+    if(!withinMapHeight(en)) return NULL;
 
     struct tile* up1 = pointToTile(en->x + 5, en->y, tiles);
     struct tile* up2 = pointToTile(en->x+en->w - 5, en->y, tiles);
@@ -109,7 +117,7 @@ struct tile* tileUpCollision(struct entity* en, struct tile** tiles){
 
 struct tile* tileDownCollision(struct entity* en, struct tile** tiles){
     // Se não estiver dentro dos limites
-    if(!withinLimits(en)) return NULL;
+    if(!withinMapHeight(en)) return NULL;
 
     struct tile* down1 = pointToTile(en->x + 5, en->y+en->h, tiles);
     struct tile* down2 = pointToTile(en->x+en->w - 5, en->y+en->h, tiles);
@@ -138,34 +146,39 @@ struct tile** loadLevel(char* levelPath, struct entityList* l, ALLEGRO_BITMAP***
     char c;
     int i = 0, j = 0;
     while((c = fgetc(file)) != EOF){
-        if(j == MAP_WIDTH){
-            fgetc(file);
-            i++;
-            j = 0;
-        }
         switch(c){
-            case '\n': break;
-            case MAIN_CHARACTER: case GOOMBA: case TURTLE:
+            case '\n':  
+                i++;
+                j = 0;
+                break;
+            /* Se corresponder a alguma entidade, a adiciona e coloca o bloco vazio no mesmo local */
+            case GOOMBA: case TURTLE: case FLOWER: case STAR:
+            case SHELL: case MUSHROOM: case COIN: 
                 whichSprite = entitySpriteID(c);
                 width = al_get_bitmap_width(sprites[whichSprite][0]);
                 height = al_get_bitmap_height(sprites[whichSprite][0]);
                 insertEntity(l,
                     newEntity(c, j*TILE_WIDTH, i*TILE_HEIGHT, width, height, RIGHT, 
-                        newAnimation(whichSprite, 2, FRAME_DURATION),
-                        -1
+                        newAnimation(whichSprite), -1
                     )
                 );
                 newT = newTile( j * TILE_WIDTH, i * TILE_HEIGHT, TILE_WIDTH, TILE_HEIGHT, 0, EMPTY_BLOCK);
                 t[i][j] = *newT;
                 free(newT);
+                j++;
                 break;
-            default:
-                newT = newTile( j * TILE_WIDTH, i * TILE_HEIGHT, TILE_WIDTH, TILE_HEIGHT, c != EMPTY_BLOCK ? 1 : 0, c);
+            /* Se não for nenhuma entidade, adiciona um bloco no local */
+            default: 
+                newT = newTile(j * TILE_WIDTH, i * TILE_HEIGHT, TILE_WIDTH, TILE_HEIGHT,
+                                c != EMPTY_BLOCK ? 1 : 0, c
+                            );
+                            
                 t[i][j] = *newT;
                 free(newT);
+                j++;
                 break;
         }
-        j++;
+        
     }
 
     fclose(file);

@@ -6,6 +6,27 @@
 
 #include <math.h>
 
+ALLEGRO_BITMAP** loadEntitySprite(char* path){
+    ALLEGRO_BITMAP* mainBitmap = al_load_bitmap(path);
+   
+    int width = al_get_bitmap_width(mainBitmap);
+    int height = al_get_bitmap_height(mainBitmap);
+    int frameWidth = width / FRAMES_N;
+
+    ALLEGRO_BITMAP** sprites = calloc(FRAMES_N, sizeof(ALLEGRO_BITMAP*));
+    mustAllocate(sprites, "sprites");
+
+    ALLEGRO_BITMAP* subBitmap = NULL;
+
+    for(int i = 0; i < FRAMES_N; i++){
+        subBitmap = al_create_sub_bitmap(mainBitmap, i * frameWidth, 0, frameWidth, height);
+        mustAllocate(subBitmap, path);
+        sprites[i] = subBitmap;
+    }
+
+    return sprites;
+}
+
 ALLEGRO_BITMAP** loadTileSprites(){
     ALLEGRO_BITMAP** sprites = calloc(TILES_SPRITES_N, sizeof(ALLEGRO_BITMAP*));
     mustAllocate(sprites, "sprites");
@@ -32,120 +53,29 @@ ALLEGRO_BITMAP** loadTileSprites(){
     return sprites;
 }
 
-
-// Carrega as sprites do goomba
-ALLEGRO_BITMAP** loadGoombaFrames(){
-    ALLEGRO_BITMAP** frames = malloc(sizeof(ALLEGRO_BITMAP*) * 4);
-    mustAllocate(frames, "goomba frames");
-
-    frames[0] = al_load_bitmap("resources/sprites/goomba/goomba_walk1.png");
-    mustAllocate(frames[0], "goomba_walk1");
-    frames[1] = al_load_bitmap("resources/sprites/goomba/goomba_idle.png");
-    mustAllocate(frames[1], "goombla_idle");
-    frames[2] = al_load_bitmap("resources/sprites/goomba/goomba_walk2.png");
-    mustAllocate(frames[2], "goomba_walk2");
-    frames[3] = al_load_bitmap("resources/sprites/goomba/goomba_jump.png");
-    mustAllocate(frames[3], "goomba_jump");
-
-    return frames;
-}
-
-// Carrega as sprites da flor
-ALLEGRO_BITMAP** loadFlowerFrames(){
-    ALLEGRO_BITMAP** frames = malloc(sizeof(ALLEGRO_BITMAP*) * 4);
-    mustAllocate(frames, "flower frames");
-
-    for(int i = 0; i < 4; i++){
-        frames[i] = al_load_bitmap("resources/sprites/collectables/flower.png");
-        mustAllocate(frames[i], "flower");
-    }
-    
-    return frames;
-}
-
-// Carrega as sprites da estrela
-ALLEGRO_BITMAP** loadStarFrames(){
-    ALLEGRO_BITMAP** frames = malloc(sizeof(ALLEGRO_BITMAP*) * 4);
-    mustAllocate(frames, "star frames");
-
-    for(int i = 0; i < 4; i++){
-        frames[i] = al_load_bitmap("resources/sprites/collectables/star.png");
-        mustAllocate(frames[i], "star");
-    }
-    
-    return frames;
-}
-
-// ----------- SOON ------
-// ALLEGRO_BITMAP** loadShellFrames(){
-//     ALLEGRO_BITMAP** frames = malloc(sizeof(ALLEGRO_BITMAP*) * 4);
-//     mustAllocate(frames, "star frames");
-
-//     for(int i = 0; i < 4; i++){
-//         frames[i] = al_load_bitmap("resources/sprites/collectables/star.png");
-//         mustAllocate(frames[i], "star");
-//     }
-    
-//     return frames;
-// }
-
-// Carrega as sprites do cogumelo
-ALLEGRO_BITMAP** loadMushroomFrames(){
-    ALLEGRO_BITMAP** frames = malloc(sizeof(ALLEGRO_BITMAP*) * 4);
-    mustAllocate(frames, "mushroom frames");
-
-    for(int i = 0; i < 4; i++){
-        frames[i] = al_load_bitmap("resources/sprites/collectables/mushroom.png");
-        mustAllocate(frames[i], "mushroom");
-    }
-    
-    return frames;
-}
-
-ALLEGRO_BITMAP** loadCoinFrames(){
-    ALLEGRO_BITMAP** frames = malloc(sizeof(ALLEGRO_BITMAP*) * 4);
-    mustAllocate(frames, "coin frames");
-
-    for(int i = 0; i < 4; i++){
-        frames[i] = al_load_bitmap("resources/sprites/collectables/coin.png");
-        mustAllocate(frames[i], "coin");
-    }
-    
-    return frames;
-}
-
-// Carrega as sprites do main character
-ALLEGRO_BITMAP** loadMainFrames(){
-    ALLEGRO_BITMAP** frames = malloc(sizeof(ALLEGRO_BITMAP*) * 4);
-    mustAllocate(frames, "frames");
-
-    frames[0] = al_load_bitmap("resources/sprites/mario/mario_walk1.png");
-    frames[1] = al_load_bitmap("resources/sprites/mario/mario_idle.png");
-    frames[2] = al_load_bitmap("resources/sprites/mario/mario_walk2.png");
-    frames[3] = al_load_bitmap("resources/sprites/mario/mario_jump.png");
-    
-    return frames;
-}
-
 ALLEGRO_BITMAP*** loadSprites(){
     ALLEGRO_BITMAP*** sprites = calloc(ENTITY_SPRITES_N, sizeof(ALLEGRO_BITMAP**));
     mustAllocate(sprites, "sprites");
 
-    sprites[MAIN_CHARACTER_SPRITE] = loadMainFrames();
-    sprites[GOOMBA_SPRITE] = loadGoombaFrames();
-    sprites[TURTLE_SPRITE] = loadGoombaFrames();
-    sprites[FLOWER_SPRITE] = loadFlowerFrames();
-    sprites[STAR_SPRITE] = loadStarFrames();
-    sprites[SHELL_SPRITE] = loadGoombaFrames();
-    sprites[MUSHROOM_SPRITE] = loadMushroomFrames();
-    sprites[COIN_SPRITE] = loadCoinFrames();
+    sprites[CHAR_SPRITE] = loadEntitySprite("resources/sprites/entities/mario.png");
+    sprites[SMALL_CHAR_SPRITE] = loadEntitySprite("resources/sprites/entities/mario_small.png");
+    sprites[CHAR_FLOWER_SPRITE] = loadEntitySprite("resources/sprites/entities/mario_flower.png");
+    sprites[GOOMBA_SPRITE] = loadEntitySprite("resources/sprites/entities/goomba.png");
+    sprites[TURTLE_SPRITE] = loadEntitySprite("resources/sprites/entities/turtle.png");
+    sprites[FLOWER_SPRITE] = loadEntitySprite("resources/sprites/entities/flower.png");
+    sprites[STAR_SPRITE] = loadEntitySprite("resources/sprites/entities/star.png");
+    sprites[SHELL_SPRITE] = loadEntitySprite("resources/sprites/entities/shell.png");
+    sprites[MUSHROOM_SPRITE] = loadEntitySprite("resources/sprites/entities/mushroom.png");
+    sprites[COIN_SPRITE] = loadEntitySprite("resources/sprites/entities/coin.png");
 
     return sprites;
 }
 
 int entitySpriteID(char type){
     switch(type){
-        case MAIN_CHARACTER: return MAIN_CHARACTER_SPRITE; break;
+        case MAIN_CHARACTER: return CHAR_SPRITE; break;
+        case MAIN_SMALL: return SMALL_CHAR_SPRITE; break;
+        case MAIN_FLOWER: return CHAR_FLOWER_SPRITE; break;
         case GOOMBA: return GOOMBA_SPRITE; break;
         case TURTLE: return TURTLE_SPRITE; break;
         case FLOWER: return FLOWER_SPRITE; break;
@@ -154,17 +84,16 @@ int entitySpriteID(char type){
         case MUSHROOM: return MUSHROOM_SPRITE; break;
         case COIN: return COIN_SPRITE; break;
     }
+
     return MUSHROOM_SPRITE;
 }
 
-struct animation* newAnimation(int whichSprite, int lFrame, int fDuration){
+struct animation* newAnimation(int whichSprite){
     struct animation* a = calloc(1, sizeof(struct animation));
     mustAllocate(a, "animation");
 
     a->whichSprite = whichSprite;
-    a->lastFrame = lFrame;
-    a->frameDuration = fDuration;
-    a->currentClock = fDuration;
+    a->currentClock = FRAME_DURATION;
     a->currentFrame = IDLE_FRAME;
     a->reset = 0;
 
@@ -173,13 +102,13 @@ struct animation* newAnimation(int whichSprite, int lFrame, int fDuration){
 
 void updateWalkFrame(struct entity* en){
     if(en->anim->currentClock == 0){
-        if(en->anim->currentFrame >= en->anim->lastFrame) en->anim->reset = 1;
-        if(en->anim->currentFrame == 0) en->anim->reset = 0;
+        if(en->anim->currentFrame >= WALK_END) en->anim->reset = 1;
+        if(en->anim->currentFrame == WALK_START) en->anim->reset = 0;
         
         if(!en->anim->reset) en->anim->currentFrame += 1;
         else en->anim->currentFrame -= 1;
 
-        en->anim->currentClock = en->anim->frameDuration;
+        en->anim->currentClock = WALK_END;
     } else en->anim->currentClock -= 1;
 }
 
@@ -250,10 +179,20 @@ void drawTiles(struct tile** tiles, ALLEGRO_BITMAP** sprites, int* offset){
         for(int x = 0; x < MAP_WIDTH; x++){
             if(tiles[y][x].active){
                 whichSprite = tileSpriteID(tiles[y][x].type);
-                al_draw_bitmap(sprites[whichSprite],
-                tiles[y][x].x + *offset,
-                tiles[y][x].y,
-                0);
+                if(tiles[y][x].content){
+                    al_draw_bitmap(sprites[whichSprite],
+                    tiles[y][x].x + *offset,
+                    tiles[y][x].y,
+                    0);
+                }
+                else {
+                    // Se não tiver conteudos no bloco, pinta de cinza
+                    al_draw_tinted_bitmap(sprites[whichSprite],
+                    al_map_rgb(105,105,105), 
+                    tiles[y][x].x + *offset,
+                    tiles[y][x].y,
+                    0);
+                }
             }
         }
     }

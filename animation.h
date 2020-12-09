@@ -6,14 +6,18 @@
 #include "level.h"
 #include "entity_list.h"
 
-#define FRAMES_N 4 // Quantos frames tem a animação
+#define FRAMES_N 5 // Quantos frames tem uma sprite
 #define FRAME_DURATION 10 // Duração padrão de cada frame da animação
-#define IDLE_FRAME 1 // Indice padrão do frame de IDLE
-#define JUMP_FRAME 3 // Indice padrão do frame de JUMPING
+#define WALK_START 2 // Indice do primeiro frame de walk
+#define WALK_END 4 // Indice do ultimo frame de walk
+#define IDLE_FRAME 0 // Indice padrão do frame de IDLE
+#define JUMP_FRAME 1 // Indice padrão do frame de JUMPING
 
-#define ENTITY_SPRITES_N 7
+#define ENTITY_SPRITES_N 9
 typedef enum {
-    MAIN_CHARACTER_SPRITE = 0,
+    CHAR_SPRITE = 0,
+    SMALL_CHAR_SPRITE,
+    CHAR_FLOWER_SPRITE,
     GOOMBA_SPRITE,
     TURTLE_SPRITE,
     FLOWER_SPRITE,
@@ -38,18 +42,12 @@ typedef enum {
 
 struct animation {
     int whichSprite; // ID da sprite que deve utilizar
-    int lastFrame; // Indice do último frame da animação
-    int frameDuration; // Quantos clocks duram um frame
     int currentClock; // Clock atual
     int currentFrame; // Frame atual
     int reset; // Se deve começar a resetar os frames
 };
 
 ALLEGRO_BITMAP** loadTileSprites();
-
-ALLEGRO_BITMAP** loadMainFrames();
-
-ALLEGRO_BITMAP** loadGoombaFrames();
 
 ALLEGRO_BITMAP*** loadSprites();
 
@@ -60,7 +58,7 @@ int entitySpriteID(char type);
 int tileSpriteID(char type);
 
 // Cria um conjunto de atributos utilizados para fazer uma animação
-struct animation* newAnimation(int whichSprite, int lFrame, int fDuration);
+struct animation* newAnimation(int whichSprite);
 
 // Desenha uma entidade qualquer utilizando um deslocamento de câmera
 void drawEntity(struct entity* en, int* offset, ALLEGRO_BITMAP*** sprites);

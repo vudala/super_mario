@@ -26,22 +26,22 @@ typedef enum {
 } TilesType;
 
 struct tile {
-    int x;
-    int y;
-    int w;
-    int h;
-    int active;
-    int type;
-    int highlight;
+    int x; // Posicação X
+    int y; // Posicao Y
+    int w; // Largura
+    int h; // Altura 
+    int active; // Se é um bloco ativo
+    int type; // Tipo do bloco
+    int content; // Quantos contéudos o bloco armazena, ex: 3 moedas
 };
 
-// Lê o arquivo de configuração do level, retorna as tiles dele e preenche as entidades
+// Lê o arquivo de configuração do mapa, retorna as tiles dele e preenche as entidades
 struct tile** loadLevel(char* levelPath, struct entityList* l, ALLEGRO_BITMAP*** sprites);
 
 // Aponta para a tile presente naquele par de coordenadas
 struct tile* pointToTile(int x, int y, struct tile** tiles);
 
-// Retorna o ID da entidade correspondente ao tipo do bloco : -1 se não houver nada associado a ele
+// Retorna o ID da entidade correspondente conteúdo do bloco : -1 se não houver nada associado a ele
 int specialTileContent(char type);
 
 // Aponta para a tile em que há colisao acima, do contrário retorna NULL
@@ -56,7 +56,7 @@ struct tile* tileLeftCollision(struct entity* en, struct tile** tiles);
 // Aponta para a tile em que há colisao a direita, do contrário retorna NULL
 struct tile* tileRightCollision(struct entity* en, struct tile** tiles);
 
-// Converte o valor C para um indice de um sprite
-int getTileV(char c);
+int withinMapWidth(struct entity* en);
+int withinMapHeight(struct entity* en);
 
 #endif

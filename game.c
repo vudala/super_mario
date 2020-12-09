@@ -38,6 +38,14 @@ int gameInit(){
     return PLAY;
 }
 
+void updateCameraOffset(int* offset, struct entity* character){
+    *offset = -(character->x - (VIRTUAL_WIDTH / 2));
+    if(*offset > -TILE_WIDTH)
+        *offset = -TILE_WIDTH;
+    else if (character->x + (VIRTUAL_WIDTH / 2) > (TILE_WIDTH)* (MAP_WIDTH - 1))
+        *offset = -(TILE_WIDTH * (MAP_WIDTH - 1) - VIRTUAL_WIDTH);
+}
+
 int gamePlay(int* score){
 
     ALLEGRO_BITMAP*** sprites = loadSprites();
@@ -57,11 +65,10 @@ int gamePlay(int* score){
 
     struct tile** tiles = loadLevel("resources/database/level.txt", entities, sprites);
     
-    struct animation* anim = newAnimation(MAIN_CHARACTER_SPRITE, 2, FRAME_DURATION);
-    struct entity* character = newEntity(MAIN_CHARACTER_SPRITE, 120, 510,
-        al_get_bitmap_width(sprites[MAIN_CHARACTER_SPRITE][0]),
-        al_get_bitmap_height(sprites[MAIN_CHARACTER_SPRITE][0]),
-        RIGHT, anim, -1);
+    struct entity* character = newEntity(MAIN_SMALL, 120, 510,
+        SMALL_WIDTH,
+        SMALL_HEIGHT,
+        RIGHT, newAnimation(SMALL_CHAR_SPRITE), -1);
 
     int offset = 0;
 
@@ -82,7 +89,7 @@ int gamePlay(int* score){
                     done = true;
                 }
                 
-                offset = -(character->x - (VIRTUAL_WIDTH / 2));
+                updateCameraOffset(&offset, character);
                
                 if(key[ALLEGRO_KEY_ESCAPE]) {
                     newState = DESTROY;
@@ -112,6 +119,16 @@ int gamePlay(int* score){
         if(redraw && al_is_event_queue_empty(queue))
         {
             al_clear_to_color(al_map_rgb(127, 127, 127));
+            
+            if(character->power == MUSHROOM_POWER)
+                al_draw_text(font, al_map_rgb(255, 0, 0), 300, 10, 0, "MUSHROOM_POWER");
+            if(character->power == FLOWER_POWER)
+                al_draw_text(font, al_map_rgb(255, 0, 0), 300, 10, 0, "FLOWER_POWER");
+            if(character->power == STAR_POWER)
+                al_draw_text(font, al_map_rgb(255, 0, 0), 300, 10, 0, "STAR_POWER");
+            if(character->power == NO_POWER)
+                al_draw_text(font, al_map_rgb(255, 0, 0), 300, 10, 0, "NO_POWER");
+
             // Desenha o mapa
             drawTiles(tiles, tileSprites, &offset);
             // Desenha o personagem principal
@@ -137,9 +154,9 @@ int gamePlay(int* score){
     destroyEntity(character);
     destroyList(entities);
     
-    for(int i = 0; i < ENTITY_SPRITES_N; i++)
-        for(int j = 0; j < FRAMES_N; j++)
-            al_destroy_bitmap(sprites[i][j]);
+    // for(int i = 0; i < ENTITY_SPRITES_N; i++)
+    //     for(int j = 0; j < FRAMES_N; j++)
+    //         al_destroy_bitmap(sprites[i][j]);
 
     return newState;
 }

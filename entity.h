@@ -18,10 +18,15 @@
 #define PLAYER_WALKING_SPEED 4.0
 #define MONSTER_WALKING_SPEED 2.0
 
-#define MAX_ENEMIES 50
+#define SMALL_WIDTH 40 // Largura do personagem pequeno
+#define SMALL_HEIGHT 48 // Altura do personagem pequeno
+#define BIG_WIDTH 40 // Largura do personagem grande
+#define BIG_HEIGHT 60 // Altura do personagem grande 
 
 typedef enum {
     MAIN_CHARACTER = 'X',
+    MAIN_SMALL = 'x',
+    MAIN_FLOWER = 'K',
     GOOMBA = 'g',
     TURTLE = 't',
     FLOWER = 'F',
@@ -33,10 +38,14 @@ typedef enum {
 
 typedef enum {
     NO_POWER = 0,
-    MUSHROOM_POWER,
-    FLOWER_POWER,
-    STAR_POWER
+    MUSHROOM_POWER = MUSHROOM,
+    FLOWER_POWER = FLOWER,
+    STAR_POWER = STAR
 } Powers;
+
+#define HIT_SPAN 30 // Frames invencíveis após tomar um hit
+#define INVINCIBLE_SECONDS 10 // Quantos segundos deve ficar invencível pelo poder da estrela
+#define INVINCIBILTY (INVINCIBLE_SECONDS * FPS) // Frames invencíveis do pode da estrela
 
 struct entity {
     int type; // Tipo de entidade
@@ -53,6 +62,7 @@ struct entity {
     temporarias */
     int lifeSpan;
     int power; // Power up do personagem
+    int invincibility; // Por quantos frames a entidade ficará invencível
     struct animation* anim; // Animação
 };
 
@@ -62,11 +72,8 @@ struct entity* newEntity(int type, int x, int y, int w, int h, int dir, struct a
 // Checa colisão entre duas entidades
 int entityCollision(struct entity* en1, struct entity* en2);
 
-// Checa colisão entre duas entidades, uma para cada extremo
+// Checa colisão com a entidade de baixo
 int entityDownCollision(struct entity* en1, struct entity* en2);
-// int entityLeftCollision(struct entity* en1, struct entity* en2);
-// int entityRightCollision(struct entity* en1, struct entity* en2);
-// int entityUpCollision(struct entity* en1, struct entity* en2);
 
 // Atualiza o estado de uma entidade qualquer
 void updateEntity(struct entity* en, struct tile** tiles);
