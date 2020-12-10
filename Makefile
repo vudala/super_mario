@@ -1,8 +1,7 @@
 
 CC = gcc
 CFLAGS = -Wall -std=c99
-OBJECTS = main.o game.o level.o entity.o utils.o animation.o entity_list.o character.o
-HEADERS = game.h level.h entity.h utils.h animation.h entity_list.h character.h
+OBJECTS = main.o game.o level.o entity.o utils.o animation.o entity_list.o character.o sound.o
 LIBS = -lallegro_font -lallegro_image -lallegro_primitives -lallegro -lallegro_audio -lallegro_acodec -lm
 OUTPUT = game
 
@@ -32,6 +31,10 @@ animation.o: animation.c
 
 character.o: character.c
 	$(CC) $(CFLAGS) -g -c character.c
+
+sound.o: sound.c
+	$(CC) $(CFLAGS) -g -c sound.c
+
 
 clean:
 	rm -rf $(OBJECTS)

@@ -5,8 +5,38 @@
 #include "entity_list.h"
 #include "utils.h"
 #include "character.h"
+#include "sound.h"
 
 #include <stdio.h>
+
+// void newGame(){
+//     struct game* g = malloc(sizeof(struct game));
+//     mustAllocate(g, "game");
+
+//     g->timer = al_create_timer(1.0 / FPS);
+//     mustInit(g->timer, "timer");
+
+//     g->queue = al_create_event_queue();
+//     mustInit(g->queue, "queue");
+
+//     g->disp = disp = al_create_display(VIRTUAL_WIDTH, VIRTUAL_HEIGHT);
+//     mustInit(g->disp, "display");
+
+//     g->font = al_create_builtin_font();
+//     mustInit(g->font, "font");
+
+//     al_register_event_source(g->queue, al_get_keyboard_event_source());
+//     al_register_event_source(g->queue, al_get_display_event_source(disp));
+//     al_register_event_source(g->queue, al_get_timer_event_source(timer));
+
+//     al_start_timer(timer);
+
+//     memset(key, 0, sizeof(key));
+
+//     ALLEGRO_BITMAP*** sprites;
+//     ALLEGRO_BITMAP** tileSprites;
+//     ALLEGRO_SAMPLE* samples;
+// }
 
 int gameInit(){
     mustInit(al_init(), "allegro");
@@ -51,16 +81,9 @@ void updateCameraOffset(int* offset, struct character* character){
 
 int gamePlay(int* score){
 
+    ALLEGRO_SAMPLE** samples = loadSamples();
     ALLEGRO_BITMAP*** sprites = loadSprites();
     ALLEGRO_BITMAP** tileSprites = loadTileSprites();
-
-    ALLEGRO_SAMPLE* rojao = al_load_sample("resources/sounds/rojao.wav");
-    mustInit(rojao, "rojao");
-
-    ALLEGRO_AUDIO_STREAM* soundtrack = al_load_audio_stream("resources/sounds/soundtrack.opus", 2, 2048);
-    mustInit(soundtrack, "soundtrack");
-    al_set_audio_stream_playmode(soundtrack, ALLEGRO_PLAYMODE_LOOP);
-    //al_attach_audio_stream_to_mixer(soundtrack, al_get_default_mixer());
 
     struct entityList* entities = malloc(sizeof(struct entityList));
     mustInit(entities, "entities");
@@ -93,20 +116,20 @@ int gamePlay(int* score){
         switch(event.type)
         {
             case ALLEGRO_EVENT_TIMER:
-
                 if (key[ALLEGRO_KEY_J] && currClock < 1 && character->power == FLOWER_POWER){
                     currClock = skillCooldown;
                     addFireball(fireballs, character->self, sprites);
+                    al_play_sample(samples[FIREBALL_SAMPLE], 1.0, 0.0, 1.0, ALLEGRO_PLAYMODE_ONCE, NULL);
                 }
                 currClock -= 1;
                 
-                newEn = tilesInteract(character, tiles, key);
+                newEn = tilesInteract(character, tiles, samples);
                 if(newEn) insertEntity(entities, newEn);
 
-                entitiesInteract(character, tiles, entities, fireballs);
+                entitiesInteract(character, tiles, entities, fireballs, samples);
 
                 // Se colidiu com outra entidade inimiga sem matá-la, termina o jogo
-                if(entitiesInteract(character, tiles, entities, fireballs)){
+                if(entitiesInteract(character, tiles, entities, fireballs, samples)){
                     newState = ENDING;
                     done = true;
                 }
@@ -163,9 +186,6 @@ int gamePlay(int* score){
         }
     }
 
-    al_destroy_audio_stream(soundtrack);
-    al_destroy_sample(rojao);
-    
     for(int i = 0; i < TILES_N; i++) al_destroy_bitmap(tileSprites[i]);
     free(tileSprites);
     free(tiles[0]);

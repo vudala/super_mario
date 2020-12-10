@@ -23,11 +23,14 @@ struct character {
 struct character* newCharacter(struct entity* en);
 
 // Atualiza os atributos do personagem, com base em inputs e estados atributos anteriores
-struct tile* updateCharacter(struct character* character, struct tile** tiles, unsigned char* key);
+struct tile* updateCharacter(struct character* character, struct tile** tiles,
+ALLEGRO_SAMPLE** samples);
 
+// Realiza a interação entre todas as entidades
 int entitiesInteract(struct character* character, struct tile** tiles, struct entityList* entities,
-struct entityList* fireballs);
+struct entityList* fireballs, ALLEGRO_SAMPLE** samples);
 
-struct entity* tilesInteract(struct character* character, struct tile** tiles, unsigned char* key);
+// Realiza a interação do personagem com o terreno
+struct entity* tilesInteract(struct character* character, struct tile** tiles, ALLEGRO_SAMPLE** samples);
 
 #endif
