@@ -10,8 +10,6 @@
 
 #define FPS 60.0
 
-#define TOP_SCORE_N 10 // Quantos scores são guardados no top score
-
 #define KEY_SEEN     1
 #define KEY_RELEASED 2
 
@@ -29,24 +27,9 @@ typedef enum {
     DESTROY
 } GameStates;
 
+void gameInit();
 
-struct game {
-    ALLEGRO_TIMER* timer;
-    ALLEGRO_EVENT_QUEUE* queue;
-    ALLEGRO_DISPLAY* disp;
-    ALLEGRO_FONT* font;
-    ALLEGRO_EVENT* event;
-    unsigned char key[ALLEGRO_KEY_MAX];
-    ALLEGRO_BITMAP*** sprites;
-    ALLEGRO_BITMAP** tileSprites;
-    ALLEGRO_SAMPLE* samples;
-};
-
-int gameInit();
-
-int gamePlay(int* score);
-
-int gameEnding(int* score);
+int gamePlay(int* score, ALLEGRO_BITMAP** screens, ALLEGRO_SAMPLE** samples);
 
 void gameDestroy();
 

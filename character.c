@@ -20,7 +20,7 @@ struct tile* updateCharacter(struct character* character, struct tile** tiles, A
 
     switch(character->self->behavior){
         case IDLE:  
-            if (key[ALLEGRO_KEY_SPACE]){ // Pula
+            if (key[ALLEGRO_KEY_UP]){ // Pula
                 character->self->dy = JUMP_VELOCITY;
                 character->self->behavior = JUMPING;
                 al_play_sample(samples[JUMP_SAMPLE], 1.0, 0.0, 1.0, ALLEGRO_PLAYMODE_ONCE, NULL);
@@ -76,7 +76,7 @@ struct tile* updateCharacter(struct character* character, struct tile** tiles, A
             
             break;
         case WALKING:
-            if (key[ALLEGRO_KEY_SPACE]) { // Pula 
+            if (key[ALLEGRO_KEY_UP]) { // Pula 
                 character->self->dy = JUMP_VELOCITY;
                 character->self->behavior = JUMPING;
             } 
@@ -211,10 +211,6 @@ struct entityList* fireballs, ALLEGRO_SAMPLE** samples){
                     case MUSHROOM: case FLOWER: case STAR:
                         givePower(character, current->en->type, samples);
                         removeEntity(current->id, entities);
-                        break;
-                    // Se for moeda, da pontos ao personagem
-                    case COIN:
-                        // + Score
                         break;
                     // Se for inimigo
                     default:

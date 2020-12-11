@@ -43,6 +43,13 @@ typedef enum {
     FLOWER_BLOCK_SPRITE
 } TileSpritesID;
 
+#define SCREENS_N 3
+typedef enum {
+    START_SCREEN = 0,
+    HELP_SCREEN,
+    SCORES_SCREEN
+} Screens;
+
 struct animation {
     int sprite; // ID da sprite que deve utilizar
     int currentClock; // Clock atual
@@ -53,6 +60,8 @@ struct animation {
 ALLEGRO_BITMAP** loadTileSprites();
 
 ALLEGRO_BITMAP*** loadSprites();
+
+ALLEGRO_BITMAP** loadScreens();
 
 // Retorna o ID da sprite correspondente ao tipo da entidade
 int entitySpriteID(char type);
@@ -71,5 +80,8 @@ void drawEntities(struct entityList* list, int* offset, ALLEGRO_BITMAP*** sprite
 
 // Desenha as tiles
 void drawTiles(struct tile** tiles, ALLEGRO_BITMAP** sprites, int* offset);
+
+// Desenha os menus e as telas do jogo
+int drawScreen(ALLEGRO_BITMAP** screens, int which, ALLEGRO_SAMPLE** samples, int* score);
 
 #endif

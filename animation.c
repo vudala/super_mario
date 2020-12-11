@@ -3,22 +3,25 @@
 #include "utils.h"
 #include "level.h"
 #include "game.h"
+#include "sound.h"
+#include "stdio.h"
 
 #include <math.h>
 
-ALLEGRO_BITMAP** loadEntitySprite(char* path){
+// Carrega uma sprite de n frames
+ALLEGRO_BITMAP** loadSprite(char* path, int frames_n){
     ALLEGRO_BITMAP* mainBitmap = al_load_bitmap(path);
    
     int width = al_get_bitmap_width(mainBitmap);
     int height = al_get_bitmap_height(mainBitmap);
-    int frameWidth = width / FRAMES_N;
+    int frameWidth = width / frames_n;
 
-    ALLEGRO_BITMAP** sprites = calloc(FRAMES_N, sizeof(ALLEGRO_BITMAP*));
+    ALLEGRO_BITMAP** sprites = calloc(frames_n, sizeof(ALLEGRO_BITMAP*));
     mustAllocate(sprites, "sprites");
 
     ALLEGRO_BITMAP* subBitmap = NULL;
 
-    for(int i = 0; i < FRAMES_N; i++){
+    for(int i = 0; i < frames_n; i++){
         subBitmap = al_create_sub_bitmap(mainBitmap, i * frameWidth, 0, frameWidth, height);
         mustAllocate(subBitmap, path);
         sprites[i] = al_clone_bitmap(subBitmap);
@@ -29,6 +32,22 @@ ALLEGRO_BITMAP** loadEntitySprite(char* path){
     return sprites;
 }
 
+ALLEGRO_BITMAP** loadScreens(){
+    ALLEGRO_BITMAP** screens = calloc(SCREENS_N, sizeof(ALLEGRO_BITMAP*));
+    mustAllocate(screens, "screens");
+
+    screens[START_SCREEN] = al_load_bitmap("resources/sprites/screens/start.png");
+    mustAllocate(screens[START_SCREEN], "start screen");
+
+    screens[HELP_SCREEN] = al_load_bitmap("resources/sprites/screens/help.png");
+    mustAllocate(screens[HELP_SCREEN],"help screen");
+    
+    screens[SCORES_SCREEN] = al_load_bitmap("resources/sprites/screens/scores.png");
+    mustAllocate(screens[SCORES_SCREEN],"scores screen");
+
+    return screens;
+}
+
 ALLEGRO_BITMAP** loadTileSprites(){
     ALLEGRO_BITMAP** sprites = calloc(TILE_SPRITES_N, sizeof(ALLEGRO_BITMAP*));
     mustAllocate(sprites, "sprites");
@@ -37,7 +56,7 @@ ALLEGRO_BITMAP** loadTileSprites(){
     mustAllocate(sprites[0],"a");
     sprites[1] = al_load_bitmap("resources/sprites/tiles/brick.png");
     mustAllocate(sprites[1],"a");
-    sprites[2] = al_load_bitmap("resources/sprites/tiles/brick.png");
+    sprites[2] = al_load_bitmap("resources/sprites/tiles/hard_brick.png");
     mustAllocate(sprites[2],"a");
     sprites[3] = al_load_bitmap("resources/sprites/tiles/pipe.png");
     mustAllocate(sprites[3],"a");
@@ -59,17 +78,17 @@ ALLEGRO_BITMAP*** loadSprites(){
     ALLEGRO_BITMAP*** sprites = calloc(ENTITY_SPRITES_N, sizeof(ALLEGRO_BITMAP**));
     mustAllocate(sprites, "sprites");
 
-    sprites[CHAR_SPRITE] = loadEntitySprite("resources/sprites/entities/mario.png");
-    sprites[SMALL_CHAR_SPRITE] = loadEntitySprite("resources/sprites/entities/mario_small.png");
-    sprites[CHAR_FLOWER_SPRITE] = loadEntitySprite("resources/sprites/entities/mario_flower.png");
-    sprites[GOOMBA_SPRITE] = loadEntitySprite("resources/sprites/entities/goomba.png");
-    sprites[TURTLE_SPRITE] = loadEntitySprite("resources/sprites/entities/turtle.png");
-    sprites[FLOWER_SPRITE] = loadEntitySprite("resources/sprites/entities/flower.png");
-    sprites[STAR_SPRITE] = loadEntitySprite("resources/sprites/entities/star.png");
-    sprites[SHELL_SPRITE] = loadEntitySprite("resources/sprites/entities/shell.png");
-    sprites[MUSHROOM_SPRITE] = loadEntitySprite("resources/sprites/entities/mushroom.png");
-    sprites[COIN_SPRITE] = loadEntitySprite("resources/sprites/entities/coin.png");
-    sprites[FIREBALL_SPRITE] = loadEntitySprite("resources/sprites/entities/fireball.png");
+    sprites[CHAR_SPRITE] = loadSprite("resources/sprites/entities/mario.png" , FRAMES_N);
+    sprites[SMALL_CHAR_SPRITE] = loadSprite("resources/sprites/entities/mario_small.png", FRAMES_N);
+    sprites[CHAR_FLOWER_SPRITE] = loadSprite("resources/sprites/entities/mario_flower.png", FRAMES_N);
+    sprites[GOOMBA_SPRITE] = loadSprite("resources/sprites/entities/goomba.png", FRAMES_N);
+    sprites[TURTLE_SPRITE] = loadSprite("resources/sprites/entities/turtle.png", FRAMES_N);
+    sprites[FLOWER_SPRITE] = loadSprite("resources/sprites/entities/flower.png", FRAMES_N);
+    sprites[STAR_SPRITE] = loadSprite("resources/sprites/entities/star.png", FRAMES_N);
+    sprites[SHELL_SPRITE] = loadSprite("resources/sprites/entities/shell.png", FRAMES_N);
+    sprites[MUSHROOM_SPRITE] = loadSprite("resources/sprites/entities/mushroom.png", FRAMES_N);
+    sprites[COIN_SPRITE] = loadSprite("resources/sprites/entities/coin.png", FRAMES_N);
+    sprites[FIREBALL_SPRITE] = loadSprite("resources/sprites/entities/fireball.png", FRAMES_N);
 
     return sprites;
 }
@@ -186,4 +205,77 @@ void drawTiles(struct tile** tiles, ALLEGRO_BITMAP** sprites, int* offset){
             }
         }
     }
+}
+
+int drawScreen(ALLEGRO_BITMAP** screens, int which, ALLEGRO_SAMPLE** samples, int* score){
+    bool done = false;
+    bool redraw = true;
+    int newState = DESTROY;
+    
+    for(;;)
+    {
+        al_wait_for_event(queue, &event);
+        switch(event.type)
+        {
+            case ALLEGRO_EVENT_TIMER:
+                redraw = true;
+                break;
+
+            case ALLEGRO_EVENT_KEY_DOWN:
+                switch(event.keyboard.keycode){
+                    case ALLEGRO_KEY_ESCAPE:
+                        al_play_sample(samples[SELECT_SAMPLE], 1.0, 1.0, 1.0, ALLEGRO_PLAYMODE_ONCE, NULL);
+                        done = true;
+                        break;
+                    case ALLEGRO_KEY_H:
+                        if(which == START_SCREEN){
+                            al_play_sample(samples[SELECT_SAMPLE], 1.0, 1.0, 1.0, ALLEGRO_PLAYMODE_ONCE, NULL);
+                            drawScreen(screens, HELP_SCREEN, samples, NULL);
+                        }
+                        break;
+                    case ALLEGRO_KEY_UP:
+                        if(which == START_SCREEN){
+                            al_play_sample(samples[SELECT_SAMPLE], 1.0, 1.0, 1.0, ALLEGRO_PLAYMODE_ONCE, NULL);
+                            newState = PLAY;
+                            done = true;
+                        }
+                        break;
+                    case ALLEGRO_KEY_ENTER:
+                        if(which == SCORES_SCREEN){
+                            al_play_sample(samples[SELECT_SAMPLE], 1.0, 1.0, 1.0, ALLEGRO_PLAYMODE_ONCE, NULL);
+                            newState = PLAY;
+                            done = true;
+                        }
+                        break;
+                }
+                break;
+            case ALLEGRO_EVENT_DISPLAY_CLOSE:
+                done = true;
+                break;
+        }
+
+        if(done) break;
+
+        if(redraw && al_is_event_queue_empty(queue))
+        {
+            al_clear_to_color(al_map_rgb(127, 127, 127));
+
+            al_draw_bitmap(screens[which], 0, 0, 0);
+
+            if(which == SCORES_SCREEN){
+                int* scores = getScores(score);
+                char* aux = malloc(sizeof(char) * 9); // Comporta um decimal de até 10 casas
+                for(int i = 0; i < TOP_SCORE_N; i++){
+                    sprintf(aux, "%2d %9d", i, scores[i]); 
+                    al_draw_text(font, al_map_rgb(RGB_MAX, RGB_MAX, RGB_MAX), 600, 150 + i * 40, 0 , aux);
+                }
+                
+            }
+                 
+            al_flip_display();
+            redraw = false;
+        }
+    }
+    
+    return newState;
 }
