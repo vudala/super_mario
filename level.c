@@ -142,8 +142,8 @@ struct tile** loadLevel(char* levelPath, struct entityList* l, ALLEGRO_BITMAP***
     struct tile* newT = NULL;
     int whichSprite = 0;
     int width, height;
+    char c, type;
 
-    char c;
     int i = 0, j = 0;
     while((c = fgetc(file)) != EOF){
         switch(c){
@@ -168,11 +168,20 @@ struct tile** loadLevel(char* levelPath, struct entityList* l, ALLEGRO_BITMAP***
                 j++;
                 break;
             /* Se não for nenhuma entidade, adiciona um bloco no local */
-            default: 
+            default:;
+                // Organiza as sprites dos bloco para que fiquem em conjuntos
+                type = c;
+                struct tile* tile = pointToTile(j * TILE_WIDTH, i * TILE_HEIGHT - 1, t);
+                if(tile != NULL && tile->active)
+                    switch(type){
+                        case BRICK_BLOCK: type = BRICK_BODY_BLOCK; break;
+                        case PIPE_BLOCK: type = PIPE_BODY_BLOCK; break;
+                    }
+
                 newT = newTile(j * TILE_WIDTH, i * TILE_HEIGHT, TILE_WIDTH, TILE_HEIGHT,
-                                c != EMPTY_BLOCK ? 1 : 0, c
+                                type != EMPTY_BLOCK ? 1 : 0, type
                             );
-                            
+                 
                 t[i][j] = *newT;
                 free(newT);
                 j++;

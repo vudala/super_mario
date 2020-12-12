@@ -30,13 +30,14 @@ typedef enum {
     FIREBALL_SPRITE
 } EntitySpritesID;
 
-#define TILE_SPRITES_N 9
+#define TILE_SPRITES_N 10
 typedef enum {
     EMPTY_BLOCK_SPRITE = 0,
     BRICK_BLOCK_SPRITE,
+    BRICK_BODY_SPRITE,
     HARD_BRICK_BLOCK_SPRITE,
     PIPE_BLOCK_SPRITE,
-    PIPE_TOP_BLOCK_SPRITE,
+    PIPE_BODY_SPRITE,
     COIN_BLOCK_SPRITE,
     STAR_BLOCK_SPRITE,
     MUSHROOM_BLOCK_SPRITE,
@@ -59,7 +60,7 @@ struct animation {
 
 ALLEGRO_BITMAP** loadTileSprites();
 
-ALLEGRO_BITMAP*** loadSprites();
+ALLEGRO_BITMAP*** loadEntitySprites();
 
 ALLEGRO_BITMAP** loadScreens();
 

@@ -50,8 +50,8 @@ void updateCameraOffset(int* offset, struct character* character){
 
 int gamePlay(int* score, ALLEGRO_BITMAP** screens, ALLEGRO_SAMPLE** samples){
     
-    ALLEGRO_BITMAP*** sprites = loadSprites();
-    ALLEGRO_BITMAP** tileSprites = loadTileSprites();
+    ALLEGRO_BITMAP*** entitySprites = loadEntitySprites();
+    ALLEGRO_BITMAP** tileSprite = loadTileSprites();
 
     struct entityList* entities = malloc(sizeof(struct entityList));
     mustInit(entities, "entities");
@@ -61,7 +61,7 @@ int gamePlay(int* score, ALLEGRO_BITMAP** screens, ALLEGRO_SAMPLE** samples){
     mustInit(fireballs, "fireballs");
     createList(fireballs);
 
-    struct tile** tiles = loadLevel("resources/database/level.txt", entities, sprites);
+    struct tile** tiles = loadLevel("resources/database/level.txt", entities, entitySprites);
     
     struct character* character = newCharacter(newEntity(MAIN_SMALL, 120, 510,
         SMALL_WIDTH, SMALL_HEIGHT, RIGHT, newAnimation(SMALL_CHAR_SPRITE), -1));
@@ -86,7 +86,7 @@ int gamePlay(int* score, ALLEGRO_BITMAP** screens, ALLEGRO_SAMPLE** samples){
                 // Ao apertar espaço solta uma bola de fogo
                 if (key[ALLEGRO_KEY_SPACE] && currClock < 1 && character->power == FLOWER_POWER){
                     currClock = skillCooldown;
-                    addFireball(fireballs, character->self, sprites);
+                    addFireball(fireballs, character->self, entitySprites);
                     al_play_sample(samples[FIREBALL_SAMPLE], 1.0, 0.0, 1.0, ALLEGRO_PLAYMODE_ONCE, NULL);
                 }
                 currClock -= 1;
@@ -136,28 +136,28 @@ int gamePlay(int* score, ALLEGRO_BITMAP** screens, ALLEGRO_SAMPLE** samples){
             al_clear_to_color(al_map_rgb(127, 127, 127));
 
             // Desenha o mapa
-            drawTiles(tiles, tileSprites, &offset);
+            drawTiles(tiles, tileSprite, &offset);
 
             // Pintar de branco não interfere na cor
             ALLEGRO_COLOR color = al_map_rgb(255,255,255);
 
             // Desenha as diversas entidades
-            drawEntities(fireballs, &offset, sprites, color);
-            drawEntities(entities, &offset, sprites, color);
+            drawEntities(fireballs, &offset, entitySprites, color);
+            drawEntities(entities, &offset, entitySprites, color);
 
             // Desenha o personagem principal
             if(character->star) // Se estiver no modo estrela, desenha em cores aleatórias
                 color = al_map_rgb(rand() % RGB_MAX, rand() % RGB_MAX, rand() % RGB_MAX);
                 
-            drawEntity(character->self, &offset, sprites, color);
+            drawEntity(character->self, &offset, entitySprites, color);
             
             al_flip_display();
             redraw = false;
         }
     }
 
-    for(int i = 0; i < TILES_N; i++) al_destroy_bitmap(tileSprites[i]);
-    free(tileSprites);
+    for(int i = 0; i < TILES_N; i++) al_destroy_bitmap(tileSprite[i]);
+    free(tileSprite);
     free(tiles[0]);
     free(tiles);
     destroyEntity(character->self);
@@ -165,12 +165,18 @@ int gamePlay(int* score, ALLEGRO_BITMAP** screens, ALLEGRO_SAMPLE** samples){
     
     for(int i = 0; i < ENTITY_SPRITES_N; i++)
         for(int j = 0; j < FRAMES_N; j++)
-            al_destroy_bitmap(sprites[i][j]);
+            al_destroy_bitmap(entitySprites[i][j]);
 
     return newState;
 }
 
-void gameDestroy(){
+void gameDestroy(ALLEGRO_BITMAP** screens, ALLEGRO_SAMPLE** samples){
+    for(int i = 0; i < SAMPLES_N; i++)
+    al_destroy_sample(samples[i]);
+
+    for(int i = 0; i < SCREENS_N; i++)
+        al_destroy_bitmap(screens[i]);
+    
     al_destroy_display(disp);
     al_destroy_font(font);
     al_destroy_timer(timer);

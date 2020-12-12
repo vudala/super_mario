@@ -14,14 +14,7 @@ int main(){
     for(;;) switch(gameState){
         case PLAY: gameState = gamePlay(&score, screens, samples); break;
         case DESTROY:
-            for(int i = 0; i < SAMPLES_N; i++)
-                al_destroy_sample(samples[i]);
-
-            for(int i = 0; i < SCREENS_N; i++)
-                al_destroy_bitmap(screens[i]);
-
-            gameDestroy();
-            
+            gameDestroy(screens, samples);
             return 0;
             break;
     }

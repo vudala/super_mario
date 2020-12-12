@@ -52,29 +52,12 @@ ALLEGRO_BITMAP** loadTileSprites(){
     ALLEGRO_BITMAP** sprites = calloc(TILE_SPRITES_N, sizeof(ALLEGRO_BITMAP*));
     mustAllocate(sprites, "sprites");
 
-    sprites[0] = al_load_bitmap("resources/sprites/tiles/brick.png");
-    mustAllocate(sprites[0],"a");
-    sprites[1] = al_load_bitmap("resources/sprites/tiles/brick.png");
-    mustAllocate(sprites[1],"a");
-    sprites[2] = al_load_bitmap("resources/sprites/tiles/hard_brick.png");
-    mustAllocate(sprites[2],"a");
-    sprites[3] = al_load_bitmap("resources/sprites/tiles/pipe.png");
-    mustAllocate(sprites[3],"a");
-    sprites[4] = al_load_bitmap("resources/sprites/tiles/pipe_top.png");
-    mustAllocate(sprites[4],"a");
-    sprites[5] = al_load_bitmap("resources/sprites/tiles/surprise.png");
-    mustAllocate(sprites[5],"a");
-    sprites[6] = al_load_bitmap("resources/sprites/tiles/surprise.png");
-    mustAllocate(sprites[6],"a");
-    sprites[7] = al_load_bitmap("resources/sprites/tiles/surprise.png");
-    mustAllocate(sprites[7],"a");
-    sprites[8] = al_load_bitmap("resources/sprites/tiles/surprise.png");
-    mustAllocate(sprites[8],"a");
+    sprites = loadSprite("resources/sprites/tiles/tiles.png", TILE_SPRITES_N);
 
     return sprites;
 }
 
-ALLEGRO_BITMAP*** loadSprites(){
+ALLEGRO_BITMAP*** loadEntitySprites(){
     ALLEGRO_BITMAP*** sprites = calloc(ENTITY_SPRITES_N, sizeof(ALLEGRO_BITMAP**));
     mustAllocate(sprites, "sprites");
 
@@ -153,9 +136,11 @@ void drawEntity(struct entity* en, int* offset, ALLEGRO_BITMAP*** sprites, ALLEG
             break;
     }
 
-    al_draw_tinted_scaled_bitmap(frame, color, 0, 0, en->w, en->h,
-    floor(*offset + en->x) + dw, floor(en->y),
-    en->w * xScale, en->h, 0);
+    al_draw_tinted_scaled_bitmap(
+        frame, color, 0, 0, en->w, en->h,
+        floor(*offset + en->x) + dw, floor(en->y),
+        en->w * xScale, en->h, 0
+    );
 }
 
 void drawEntities(struct entityList* list, int* offset, ALLEGRO_BITMAP*** sprites, ALLEGRO_COLOR color){
@@ -169,10 +154,11 @@ void drawEntities(struct entityList* list, int* offset, ALLEGRO_BITMAP*** sprite
 int tileSpriteID(char type){
     switch(type){
         case EMPTY_BLOCK: return EMPTY_BLOCK_SPRITE; break;
-        case BRICK_BLOCK: return BRICK_BLOCK_SPRITE;
+        case BRICK_BLOCK: return BRICK_BLOCK_SPRITE; break;
+        case BRICK_BODY_BLOCK: return BRICK_BODY_SPRITE; break;
         case HARD_BRICK_BLOCK: return HARD_BRICK_BLOCK_SPRITE; break;
         case PIPE_BLOCK: return PIPE_BLOCK_SPRITE; break;
-        case PIPE_TOP_BLOCK: return PIPE_TOP_BLOCK_SPRITE; break;
+        case PIPE_BODY_BLOCK: return PIPE_BODY_SPRITE; break;
         case COIN_BLOCK: return COIN_BLOCK_SPRITE; break;
         case STAR_BLOCK: return STAR_BLOCK_SPRITE; break;
         case MUSHROOM_BLOCK: return MUSHROOM_BLOCK_SPRITE; break;
@@ -189,18 +175,19 @@ void drawTiles(struct tile** tiles, ALLEGRO_BITMAP** sprites, int* offset){
             if(tiles[y][x].active){
                 whichSprite = tileSpriteID(tiles[y][x].type);
                 if(tiles[y][x].content){
-                    al_draw_bitmap(sprites[whichSprite],
-                    tiles[y][x].x + *offset,
-                    tiles[y][x].y,
-                    0);
+                    al_draw_bitmap(
+                        sprites[whichSprite],
+                        tiles[y][x].x + *offset, tiles[y][x].y, 0
+                    );
                 }
                 else {
                     // Se não tiver conteudos no bloco, pinta de cinza
-                    al_draw_tinted_bitmap(sprites[whichSprite],
-                    al_map_rgb(105,105,105), 
-                    tiles[y][x].x + *offset,
-                    tiles[y][x].y,
-                    0);
+                    al_draw_tinted_bitmap(
+                        sprites[whichSprite],
+                        al_map_rgb(105,105,105), 
+                        tiles[y][x].x + *offset,
+                        tiles[y][x].y, 0
+                    );
                 }
             }
         }
@@ -218,7 +205,8 @@ int drawScreen(ALLEGRO_BITMAP** screens, int which, ALLEGRO_SAMPLE** samples, in
     ALLEGRO_COLOR color = al_map_rgb(RGB_MAX, RGB_MAX, RGB_MAX);
     if(which == SCORES_SCREEN){
         scores = getScores(score);
-        aux = malloc(sizeof(char) * 40);
+        // Aloca um tamanho o suficiente para caber o texto das pontuações
+        aux = malloc(sizeof(char) * 40); 
     }
 
     for(;;)
@@ -232,26 +220,38 @@ int drawScreen(ALLEGRO_BITMAP** screens, int which, ALLEGRO_SAMPLE** samples, in
 
             case ALLEGRO_EVENT_KEY_DOWN:
                 switch(event.keyboard.keycode){
-                    case ALLEGRO_KEY_ESCAPE:
-                        al_play_sample(samples[SELECT_SAMPLE], 1.0, 1.0, 1.0, ALLEGRO_PLAYMODE_ONCE, NULL);
+                    case ALLEGRO_KEY_ESCAPE: // Se apertou esc sai da tela ou do jogo
+                        al_play_sample(
+                            samples[SELECT_SAMPLE], 1.0, 1.0, 1.0,
+                            ALLEGRO_PLAYMODE_ONCE, NULL
+                        );
                         done = true;
                         break;
-                    case ALLEGRO_KEY_H:
-                        if(which == START_SCREEN){
-                            al_play_sample(samples[SELECT_SAMPLE], 1.0, 1.0, 1.0, ALLEGRO_PLAYMODE_ONCE, NULL);
+                    case ALLEGRO_KEY_H: // Se estiver no menu e aperta H, abre a tela de ajuda
+                        if(which == START_SCREEN){ 
+                            al_play_sample(
+                                samples[SELECT_SAMPLE], 1.0, 1.0, 1.0,
+                                ALLEGRO_PLAYMODE_ONCE, NULL
+                            );
                             drawScreen(screens, HELP_SCREEN, samples, NULL);
                         }
                         break;
-                    case ALLEGRO_KEY_UP:
-                        if(which == START_SCREEN){
-                            al_play_sample(samples[SELECT_SAMPLE], 1.0, 1.0, 1.0, ALLEGRO_PLAYMODE_ONCE, NULL);
+                    case ALLEGRO_KEY_UP: // Se estiver no menu e aperta UP, começa o jogo
+                        if(which == START_SCREEN){ 
+                            al_play_sample(
+                                samples[SELECT_SAMPLE], 1.0, 1.0, 1.0,
+                                ALLEGRO_PLAYMODE_ONCE, NULL
+                            );
                             newState = PLAY;
                             done = true;
                         }
                         break;
-                    case ALLEGRO_KEY_ENTER:
-                        if(which == SCORES_SCREEN){
-                            al_play_sample(samples[SELECT_SAMPLE], 1.0, 1.0, 1.0, ALLEGRO_PLAYMODE_ONCE, NULL);
+                    case ALLEGRO_KEY_ENTER: // Se estiver na teça de pontuação e aperta enter, joga novamente
+                        if(which == SCORES_SCREEN){ 
+                            al_play_sample(
+                                samples[SELECT_SAMPLE], 1.0, 1.0, 1.0,
+                                ALLEGRO_PLAYMODE_ONCE, NULL
+                            );
                             newState = PLAY;
                             done = true;
                         }
@@ -269,11 +269,12 @@ int drawScreen(ALLEGRO_BITMAP** screens, int which, ALLEGRO_SAMPLE** samples, in
         {
             al_clear_to_color(al_map_rgb(127, 127, 127));
 
+            // Desenha a tela
             al_draw_bitmap(screens[which], 0, 0, 0);
 
             // Se estiver na tela de pontuação, desenha as pontuações
             if(which == SCORES_SCREEN){
-                sprintf(aux, "Sua pontuação é: %d", *scores);
+                sprintf(aux, "Sua pontuação é: %d", *score);
                 al_draw_text(font, color, 600, 100, 0 , aux);
                 for(int i = 0; i < TOP_SCORE_N; i++){
                     sprintf(aux, "%2d %9d", i+1, scores[i]); 

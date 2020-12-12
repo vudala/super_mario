@@ -12,13 +12,14 @@ typedef struct ALLEGRO_BITMAP ALLEGRO_BITMAP;
 struct entity;
 struct entityList;
 
-#define TILES_N 9
+#define TILES_N 10
 typedef enum {
     EMPTY_BLOCK = ' ',
     BRICK_BLOCK = 'b',
+    BRICK_BODY_BLOCK = 'i',
     HARD_BRICK_BLOCK = 'h',
     PIPE_BLOCK = 'p',
-    PIPE_TOP_BLOCK = 'P',
+    PIPE_BODY_BLOCK = 'P',
     COIN_BLOCK = 'c',
     STAR_BLOCK = 's',
     MUSHROOM_BLOCK = 'm',
