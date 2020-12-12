@@ -15,7 +15,7 @@ int whichBehavior(int enType){
     // Se for qualquer uma das outras, nasce pulando
     int behavior = JUMPING;
     // Se flor moeda ou casco, ela nasce parada
-    if(enType == FLOWER || enType == COIN || enType == SHELL)
+    if(enType == FLOWER || enType == COIN || enType == SHELL || enType == CHECKPOINT)
         behavior = IDLE;
     // Se for estrela, nasce quicando
     else if(enType == STAR || enType == FIREBALL)

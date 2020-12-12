@@ -153,7 +153,7 @@ struct tile** loadLevel(char* levelPath, struct entityList* l, ALLEGRO_BITMAP***
                 break;
             /* Se corresponder a alguma entidade, a adiciona e coloca o bloco vazio no mesmo local */
             case GOOMBA: case TURTLE: case FLOWER: case STAR:
-            case SHELL: case MUSHROOM: case COIN: 
+            case SHELL: case MUSHROOM: case COIN: case CHECKPOINT:
                 whichSprite = entitySpriteID(c);
                 width = al_get_bitmap_width(sprites[whichSprite][0]);
                 height = al_get_bitmap_height(sprites[whichSprite][0]);

@@ -39,7 +39,8 @@ typedef enum {
     SHELL = 'D',
     MUSHROOM = 'M',
     COIN = 'C',
-    FIREBALL = 'B'
+    FIREBALL = 'B',
+    CHECKPOINT = 'E'
 } EntityTipe;
 
 typedef enum {

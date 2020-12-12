@@ -117,14 +117,10 @@ ALLEGRO_SAMPLE** samples, int* score){
     struct tile* t = updateCharacter(character, tiles, samples);
 
     if(t){
-        if(t->content < 1) return NULL;
+        if(t->content < 1) return NULL; // Se os contéudos de t ja se esgotaram
         switch (t->type){
-            case COIN_BLOCK:
-                *score += COIN_SCORE;
-                al_play_sample(samples[COIN_SAMPLE], 1.0, 0.0, 1.0, ALLEGRO_PLAYMODE_ONCE, NULL);
+            case COIN_BLOCK: *score += COIN_SCORE;                
             case STAR_BLOCK:case MUSHROOM_BLOCK:case FLOWER_BLOCK:;
-                // Se os contéudos de t ja se esgotaram
-                
                 int enType = specialTileContent(t->type);
                 int whichSprite = entitySpriteID(enType);
 
@@ -134,6 +130,11 @@ ALLEGRO_SAMPLE** samples, int* score){
                     newAnimation(whichSprite),
                     enType == COIN ? 10 : -1 // Se for moeda, ela tem uma duração limitada
                 );
+                
+                if(t->type == COIN_BLOCK)
+                    al_play_sample(samples[COIN_SAMPLE], 1.0, 0.0, 1.0, ALLEGRO_PLAYMODE_ONCE, NULL);
+                else
+                    al_play_sample(samples[POWERUP_SAMPLE], 1.0, 0.0, 1.0, ALLEGRO_PLAYMODE_ONCE, NULL);
 
                 t->content -= 1;
                 break;
@@ -186,75 +187,67 @@ void givePower(struct character* character, int powerType, ALLEGRO_SAMPLE** samp
     }
 }
 
-// Realiza a interação entre o personagem e uma entidades qualquer
+// Realiza a interação entre o personagem e uma entidade qualquer
+// Se acabou o jogo retorna 1, do contrário 0
 int entityInteract(struct character* character, struct entityList* entities, struct entityNode* current,
 ALLEGRO_SAMPLE** samples, int* score){
     struct entity* newEn = NULL;
-    if(entityCollision(character->self, current->en)) // Se colidir com alguma entidade
-        switch(current->en->type){
-            case SHELL:
-                // Se for um casco, e ele estiver parado e você encostar nele lateralmente
-                // Você o "chuta", do contrario voce morre
-                if (entityDownCollision(character->self, current->en)){
-                    current->en->behavior = IDLE;
-                    current->en->dx = 0;
-                    character->self->dy = MINI_BOUNCE_SPEED;
-                }
-                else if(current->en->behavior == IDLE && character->self->behavior == WALKING){
-                    current->en->behavior = WALKING;
-                    current->en->dir = character->self->x >= current->en->x ? LEFT : RIGHT;
-                    current->en->x += character->self->x >= current->en->x ? -(current->en->w / 2) : current->en->w / 2;
-                }
-                else
-                    return 1;
-
-                break;
-            // Se for um power up, da poder ao personagem
-            case MUSHROOM: case FLOWER: case STAR:
-                givePower(character, current->en->type, samples, score);
-                removeEntity(current->id, entities);
-                break;
-            // Se for inimigo
-            default:
-                // Se pular em cima dele, o fere
-                if(entityDownCollision(character->self, current->en)){
-                    // Se matou uma tartaruga, cria um casco
-                    if(current->en->type == TURTLE){
+    switch(current->en->type){
+        case CHECKPOINT: // Se for o checkpoint, termina o jogo
+            return 1;
+        case MUSHROOM: case FLOWER: case STAR:// Se for um power up, da poder ao personagem
+            givePower(character, current->en->type, samples, score);
+            removeEntity(current->id, entities);
+            break;
+        default:
+            if(entityDownCollision(character->self, current->en)){ // Se pulo em cima
+                switch(current->en->type){
+                    case SHELL: // Se for casco o para
+                        current->en->behavior = IDLE;
+                        current->en->dx = 0;
+                        character->self->dy = LOW_BOUNCE;
+                        break;
+                    case TURTLE: // Se for tartaruga cria um casco
                         newEn = newEntity(
                             SHELL, current->en->x, current->en->y,
                             current->en->w, current->en->h,
                             current->en->dir, newAnimation(SHELL_SPRITE), -1
                         );
                         insertEntity(entities, newEn);
-                    }
-                    *score += KILL_SCORE;
-                    removeEntity(current->id, entities);
-                    character->self->dy = ENTITY_BOUNCE;
-                    character->self->behavior = JUMPING;
-                    al_play_sample(samples[BOUNCE_SAMPLE], 1.0, 0.0, 1.0, ALLEGRO_PLAYMODE_ONCE, NULL);
-                    break;
-                }  // Se não, significa que encostou em um inimigo
-                else if (character->invincibility > 0){ // Se estiver invencivel não toma hit
-                    // E se tiver sob o poder da estrela, mata o inimigo
-                    if(character->star){
+                    default: // Mata a entidade
                         *score += KILL_SCORE;
                         removeEntity(current->id, entities);
-                        al_play_sample(samples[HIT_SAMPLE], 1.0, 0.0, 1.0, ALLEGRO_PLAYMODE_ONCE, NULL);
-                    }
-                } // Se estiver com algum poder
-                else if (character->power != NO_POWER){
-                    // Se tiver poder, perde o poder e fica brevemente invulnerável
-                    character->invincibility = HIT_SPAN;
-                    givePower(character, NO_POWER, samples, NULL);
+                        character->self->dy = HIGH_BOUNCE;
+                        character->self->behavior = JUMPING;
+                        al_play_sample(samples[BOUNCE_SAMPLE], 1.0, 0.0, 1.0, ALLEGRO_PLAYMODE_ONCE, NULL);
+                        break;
                 }
-                else  // Se não, morre
-                    return 1;
-                    
-                break;
-        }
+            } // Se esbarrar num casco parado enquanto anda, o chuta
+            else if(current->en->behavior == IDLE && character->self->behavior == WALKING &&
+                    current->en->type == SHELL){
+                current->en->behavior = WALKING;
+                current->en->dir = character->self->dir;
+                current->en->x += current->en->dir ? (current->en->w / 2) : -(current->en->w / 2);
+            } // Se estiver invencivel nao morre
+            else if (character->invincibility > 0){
+                if(character->star){ // Se estiver sob poder da estrela, mata a entidade
+                    *score += KILL_SCORE;
+                    removeEntity(current->id, entities);
+                    al_play_sample(samples[HIT_SAMPLE], 1.0, 0.0, 1.0, ALLEGRO_PLAYMODE_ONCE, NULL);
+                }
+            } // Se estiver com algum poder, perde o poder e fica brevemente invencivel
+            else if (character->power != NO_POWER){
+                character->invincibility = HIT_SPAN;
+                givePower(character, NO_POWER, samples, NULL);
+            } // Do contrário tomou um hit, acaba o jogo
+            else
+                return 1;
+                
+            break;
+    }
 
     return 0;
-}     
+}    
 
 int entitiesInteract(struct character* character, struct tile** tiles, struct entityList* entities,
 struct entityList* fireballs, ALLEGRO_SAMPLE** samples, int* score){
@@ -267,7 +260,7 @@ struct entityList* fireballs, ALLEGRO_SAMPLE** samples, int* score){
     while(next != NULL){
         current = next;
         next = current->next;
-        // Se ela morreu, a remove
+        // Se ela morreu
         if(isDead(current->en)) // Se ela estiver com os atributos de um morto
             removeEntity(current->id, entities);
         else if(fireballHit(fireballs, current->en)){ // Se uma bola de fogo a atingiu
@@ -276,8 +269,8 @@ struct entityList* fireballs, ALLEGRO_SAMPLE** samples, int* score){
         }
         else {
             updateEntity(current->en, tiles);
-            if(entityInteract(character, entities, current, samples, score)) 
-                return 1;
+            if(entityCollision(character->self, current->en))
+                return entityInteract(character, entities, current, samples, score);
         }        
     }
 

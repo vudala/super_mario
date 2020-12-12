@@ -72,6 +72,7 @@ ALLEGRO_BITMAP*** loadEntitySprites(){
     sprites[MUSHROOM_SPRITE] = loadSprite("resources/sprites/entities/mushroom.png", FRAMES_N);
     sprites[COIN_SPRITE] = loadSprite("resources/sprites/entities/coin.png", FRAMES_N);
     sprites[FIREBALL_SPRITE] = loadSprite("resources/sprites/entities/fireball.png", FRAMES_N);
+    sprites[CHECKPOINT_SPRITE] = loadSprite("resources/sprites/entities/mario.png", FRAMES_N);
 
     return sprites;
 }
@@ -89,6 +90,7 @@ int entitySpriteID(char type){
         case MUSHROOM: return MUSHROOM_SPRITE; break;
         case COIN: return COIN_SPRITE; break;
         case FIREBALL: return FIREBALL_SPRITE; break;
+        case CHECKPOINT: return CHECKPOINT_SPRITE; break;
     }
 
     return MUSHROOM_SPRITE;

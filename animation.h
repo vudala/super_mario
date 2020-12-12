@@ -15,7 +15,7 @@
 #define IDLE_FRAME 0 // Indice padrão do frame de IDLE
 #define JUMP_FRAME 1 // Indice padrão do frame de JUMPING
 
-#define ENTITY_SPRITES_N 11
+#define ENTITY_SPRITES_N 12
 typedef enum {
     CHAR_SPRITE = 0,
     SMALL_CHAR_SPRITE,
@@ -27,7 +27,8 @@ typedef enum {
     SHELL_SPRITE,
     MUSHROOM_SPRITE,
     COIN_SPRITE,
-    FIREBALL_SPRITE
+    FIREBALL_SPRITE,
+    CHECKPOINT_SPRITE
 } EntitySpritesID;
 
 #define TILE_SPRITES_N 10

@@ -14,7 +14,7 @@
 #define MINI_BOUNCE_SPEED -5.0
 
 struct character {
-    struct entity* self;
+    struct entity* self; // Os atributos comuns de uma entidade
     int power; // Power up do personagem
     int star; // Se está sobre efeito da estrela
     int invincibility; // Por quantos frames a entidade ficará invencível
@@ -23,11 +23,11 @@ struct character {
 // Cria um novo struct character*
 struct character* newCharacter(struct entity* en);
 
-// Atualiza os atributos do personagem, com base em inputs e estados atributos anteriores
+// Atualiza os atributos do personagem, com base em inputs e atributos anteriores
 struct tile* updateCharacter(struct character* character, struct tile** tiles,
 ALLEGRO_SAMPLE** samples);
 
-// Realiza a interação entre todas as entidades
+// Realiza a interação entre todas as entidades, se acabou o jogo retorna 1
 int entitiesInteract(struct character* character, struct tile** tiles, struct entityList* entities,
 struct entityList* fireballs, ALLEGRO_SAMPLE** samples, int* score);
 
