@@ -9,35 +9,6 @@
 
 #include <stdio.h>
 
-// void newGame(){
-//     struct game* g = malloc(sizeof(struct game));
-//     mustAllocate(g, "game");
-
-//     g->timer = al_create_timer(1.0 / FPS);
-//     mustInit(g->timer, "timer");
-
-//     g->queue = al_create_event_queue();
-//     mustInit(g->queue, "queue");
-
-//     g->disp = disp = al_create_display(VIRTUAL_WIDTH, VIRTUAL_HEIGHT);
-//     mustInit(g->disp, "display");
-
-//     g->font = al_create_builtin_font();
-//     mustInit(g->font, "font");
-
-//     al_register_event_source(g->queue, al_get_keyboard_event_source());
-//     al_register_event_source(g->queue, al_get_display_event_source(disp));
-//     al_register_event_source(g->queue, al_get_timer_event_source(timer));
-
-//     al_start_timer(timer);
-
-//     memset(key, 0, sizeof(key));
-
-//     ALLEGRO_BITMAP*** sprites;
-//     ALLEGRO_BITMAP** tileSprites;
-//     ALLEGRO_SAMPLE* samples;
-// }
-
 void gameInit(){
     mustInit(al_init(), "allegro");
     mustInit(al_install_keyboard(), "keyboard");
@@ -95,13 +66,15 @@ int gamePlay(int* score, ALLEGRO_BITMAP** screens, ALLEGRO_SAMPLE** samples){
     struct character* character = newCharacter(newEntity(MAIN_SMALL, 120, 510,
         SMALL_WIDTH, SMALL_HEIGHT, RIGHT, newAnimation(SMALL_CHAR_SPRITE), -1));
         
-    int offset = 0;
-    struct entity* newEn = NULL;
     bool done = false;
-    int newState = DESTROY;
     bool redraw = true;
+    int newState = DESTROY;
+
     int skillCooldown = 30; // Tempo de recarga da fireball
     int currClock = 0; // Quanto tempo resta até poder ser possivel lançar outra
+
+    int offset = 0;
+    struct entity* newEn = NULL;
     
     for(;;)
     {
@@ -109,6 +82,8 @@ int gamePlay(int* score, ALLEGRO_BITMAP** screens, ALLEGRO_SAMPLE** samples){
         switch(event.type)
         {
             case ALLEGRO_EVENT_TIMER:
+                // Se estiver sob poder da flor e o tempo de recarga esgotado
+                // Ao apertar espaço solta uma bola de fogo
                 if (key[ALLEGRO_KEY_SPACE] && currClock < 1 && character->power == FLOWER_POWER){
                     currClock = skillCooldown;
                     addFireball(fireballs, character->self, sprites);
@@ -116,15 +91,14 @@ int gamePlay(int* score, ALLEGRO_BITMAP** screens, ALLEGRO_SAMPLE** samples){
                 }
                 currClock -= 1;
                 
-                newEn = tilesInteract(character, tiles, samples);
+                newEn = tilesInteract(character, tiles, samples, score);
                 if(newEn) insertEntity(entities, newEn);
 
-                entitiesInteract(character, tiles, entities, fireballs, samples);
-
                 // Se colidiu com outra entidade inimiga sem matá-la, termina o jogo
-                if(entitiesInteract(character, tiles, entities, fireballs, samples)){
+                if(entitiesInteract(character, tiles, entities, fireballs, samples, score)){
                     newState = drawScreen(screens, SCORES_SCREEN, samples, score);
                     done = true;
+                    break;
                 }
                 
                 updateCameraOffset(&offset, character);
@@ -132,6 +106,7 @@ int gamePlay(int* score, ALLEGRO_BITMAP** screens, ALLEGRO_SAMPLE** samples){
                 if(key[ALLEGRO_KEY_ESCAPE]) {
                     newState = DESTROY;
                     done = true;
+                    break;
                 }
 
                 for(int i = 0; i < ALLEGRO_KEY_MAX; i++) key[i] &= KEY_SEEN;
@@ -141,7 +116,8 @@ int gamePlay(int* score, ALLEGRO_BITMAP** screens, ALLEGRO_SAMPLE** samples){
 
             case ALLEGRO_EVENT_KEY_DOWN:
                 key[event.keyboard.keycode] = KEY_SEEN | KEY_RELEASED;
-
+                if(key[ALLEGRO_KEY_H]) // Se apertou H, desenha a tela de ajuda
+                    drawScreen(screens, HELP_SCREEN, samples, score);
                 break;
             case ALLEGRO_EVENT_KEY_UP:
                 key[event.keyboard.keycode] &= KEY_RELEASED;

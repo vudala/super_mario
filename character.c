@@ -112,7 +112,7 @@ struct tile* updateCharacter(struct character* character, struct tile** tiles, A
 /* Realiza a interação do personagem com as tiles,
 retorna uma nova entidade caso seja um bloco especial */
 struct entity* tilesInteract(struct character* character, struct tile** tiles,
-ALLEGRO_SAMPLE** samples){
+ALLEGRO_SAMPLE** samples, int* score){
     struct entity* newEn = NULL;
     struct tile* t = updateCharacter(character, tiles, samples);
 
@@ -120,6 +120,7 @@ ALLEGRO_SAMPLE** samples){
         if(t->content < 1) return NULL;
         switch (t->type){
             case COIN_BLOCK:
+                *score += COIN_SCORE;
                 al_play_sample(samples[COIN_SAMPLE], 1.0, 0.0, 1.0, ALLEGRO_PLAYMODE_ONCE, NULL);
             case STAR_BLOCK:case MUSHROOM_BLOCK:case FLOWER_BLOCK:;
                 // Se os contéudos de t ja se esgotaram
@@ -142,7 +143,7 @@ ALLEGRO_SAMPLE** samples){
     return newEn;
 }
 
-void givePower(struct character* character, int powerType, ALLEGRO_SAMPLE** samples){
+void givePower(struct character* character, int powerType, ALLEGRO_SAMPLE** samples, int* score){
     switch(powerType){
         case MUSHROOM_POWER:
             if(character->power == NO_POWER){
@@ -153,8 +154,8 @@ void givePower(struct character* character, int powerType, ALLEGRO_SAMPLE** samp
                 character->self->behavior = JUMPING;
                 al_play_sample(samples[POWERUP_SAMPLE], 1.0, 0.0, 1.0, ALLEGRO_PLAYMODE_ONCE, NULL);
             }
-            //else
-                //*score += 100;
+            else
+                *score += BUFF_SCORE;
             break; 
         case FLOWER_POWER:
             if(character->power != FLOWER_POWER){
@@ -165,8 +166,8 @@ void givePower(struct character* character, int powerType, ALLEGRO_SAMPLE** samp
                 character->self->behavior = JUMPING;
                 al_play_sample(samples[POWERUP_SAMPLE], 1.0, 0.0, 1.0, ALLEGRO_PLAYMODE_ONCE, NULL);
             }
-            //else
-                //*score += 100;
+            else
+                *score += BUFF_SCORE;
             break;
         case STAR_POWER:
             character->invincibility = INVINCIBILTY;
@@ -186,7 +187,7 @@ void givePower(struct character* character, int powerType, ALLEGRO_SAMPLE** samp
 }
 
 int entitiesInteract(struct character* character, struct tile** tiles, struct entityList* entities,
-struct entityList* fireballs, ALLEGRO_SAMPLE** samples){
+struct entityList* fireballs, ALLEGRO_SAMPLE** samples, int* score){
     fireballsUpdate(fireballs, tiles);
 
     struct entityNode* current = NULL;
@@ -197,25 +198,26 @@ struct entityList* fireballs, ALLEGRO_SAMPLE** samples){
         current = next;
         next = current->next;
         // Se ela morreu, a remove
-        if(isDead(current->en)) 
+        if(isDead(current->en)) // Se ela estiver com os atributos de um morto
             removeEntity(current->id, entities);
-        else if(fireballHit(fireballs, current->en)){
+        else if(fireballHit(fireballs, current->en)){ // Se uma bola de fogo a atingiu
             removeEntity(current->id, entities);
             al_play_sample(samples[HIT_SAMPLE], 1.0, 0.0, 1.0, ALLEGRO_PLAYMODE_ONCE, NULL);
         }
         else {
             updateEntity(current->en, tiles);
-            if(entityCollision(character->self, current->en))
+            if(entityCollision(character->self, current->en)) // Se colidir com alguma entidade
                 switch(current->en->type){
                     // Se for um power up, da poder ao personagem
                     case MUSHROOM: case FLOWER: case STAR:
-                        givePower(character, current->en->type, samples);
+                        givePower(character, current->en->type, samples, score);
                         removeEntity(current->id, entities);
                         break;
                     // Se for inimigo
                     default:
                         // Se pular em cima dele, o fere
                         if(entityDownCollision(character->self, current->en)){
+                            *score += KILL_SCORE;
                             removeEntity(current->id, entities);
                             character->self->dy = ENTITY_BOUNCE;
                             character->self->behavior = JUMPING;
@@ -225,6 +227,7 @@ struct entityList* fireballs, ALLEGRO_SAMPLE** samples){
                         else if (character->invincibility > 0){ // Se estiver invencivel não toma hit
                             // E se tiver sob o poder da estrela, mata o inimigo
                             if(character->star){
+                                *score += KILL_SCORE;
                                 removeEntity(current->id, entities);
                                 al_play_sample(samples[HIT_SAMPLE], 1.0, 0.0, 1.0, ALLEGRO_PLAYMODE_ONCE, NULL);
                             }
@@ -232,7 +235,7 @@ struct entityList* fireballs, ALLEGRO_SAMPLE** samples){
                         else if (character->power != NO_POWER){
                             // Se tiver poder, perde o poder e fica brevemente invulnerável
                             character->invincibility = HIT_SPAN;
-                            givePower(character, NO_POWER, samples);
+                            givePower(character, NO_POWER, samples, NULL);
                         }
                         else  // Se não, morre
                             return 1;

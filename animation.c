@@ -211,7 +211,16 @@ int drawScreen(ALLEGRO_BITMAP** screens, int which, ALLEGRO_SAMPLE** samples, in
     bool done = false;
     bool redraw = true;
     int newState = DESTROY;
-    
+
+    // Cria estrututras a serem usadas pela tela de pontuações
+    int* scores = NULL;
+    char* aux = NULL;
+    ALLEGRO_COLOR color = al_map_rgb(RGB_MAX, RGB_MAX, RGB_MAX);
+    if(which == SCORES_SCREEN){
+        scores = getScores(score);
+        aux = malloc(sizeof(char) * 40);
+    }
+
     for(;;)
     {
         al_wait_for_event(queue, &event);
@@ -262,20 +271,31 @@ int drawScreen(ALLEGRO_BITMAP** screens, int which, ALLEGRO_SAMPLE** samples, in
 
             al_draw_bitmap(screens[which], 0, 0, 0);
 
+            // Se estiver na tela de pontuação, desenha as pontuações
             if(which == SCORES_SCREEN){
-                int* scores = getScores(score);
-                char* aux = malloc(sizeof(char) * 9); // Comporta um decimal de até 10 casas
+                sprintf(aux, "Sua pontuação é: %d", *scores);
+                al_draw_text(font, color, 600, 100, 0 , aux);
                 for(int i = 0; i < TOP_SCORE_N; i++){
-                    sprintf(aux, "%2d %9d", i, scores[i]); 
-                    al_draw_text(font, al_map_rgb(RGB_MAX, RGB_MAX, RGB_MAX), 600, 150 + i * 40, 0 , aux);
+                    sprintf(aux, "%2d %9d", i+1, scores[i]); 
+                    al_draw_text(font, color, 600, 150 + i * 40, 0 , aux);
                 }
-                
             }
                  
             al_flip_display();
             redraw = false;
         }
     }
+
+    // Destroi as estruturas da tela de pontuação
+    if(which == SCORES_SCREEN) {
+        free(scores);
+        scores = NULL;
+        free(aux);
+        aux = NULL;
+    }
     
+    // Reseta todas as teclas apertadas
+    for(int i = 0; i < ALLEGRO_KEY_MAX; i++) key[i] = 0;
+
     return newState;
 }

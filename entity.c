@@ -128,8 +128,11 @@ void updateEntity(struct entity* en, struct tile** tiles){
 
             tileUpCollision(en, tiles);
             // Se bateu em algo troca de direção
-            if(tileLeftCollision(en, tiles)) en->dir = RIGHT;
-            if(tileRightCollision(en, tiles)) en->dir = LEFT;
+            if(tileLeftCollision(en, tiles) || tileRightCollision(en, tiles)){
+                en->dir = !en->dir;
+                if(en->type == FIREBALL)
+                    en->life = 0; // Se for uma bola de fogo, a elimina
+            }
 
             break;
         case JUMPING:

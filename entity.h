@@ -17,11 +17,15 @@ typedef enum {
 
 #define GRAVITY 0.5
 
-#define FIREBALL_BOUNCE -5.0
-#define FIREBALL_SPEED 4.0
+#define FIREBALL_BOUNCE -6.0
+#define FIREBALL_SPEED 8.0
 
-#define ENTITY_BOUNCE -10.0
-#define ENTITY_SPEED 1.0
+#define ENTITY_BOUNCE -12.0
+#define ENTITY_SPEED 3.0
+
+#define COIN_SCORE 100 // Pontos ganhos para cada moeda que pegar
+#define KILL_SCORE 250 // Pontos ganhos para cada inimigo que matar
+#define BUFF_SCORE 500 // Pontos ganhos quando recebe um buff repetido ou menos poderoso que o atual
 
 typedef enum {
     MAIN_CHARACTER = 'X',

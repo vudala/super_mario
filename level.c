@@ -53,7 +53,7 @@ int withinMapWidth(struct entity* en){
 
 // Verifica se uma entidade está dentro dos limites de altura do mapa
 int withinMapHeight(struct entity* en){
-    if(en->x < 0 || en->y < 0) return 0;
+    if(en->x - 1 < 0 || en->y < 0) return 0;
     if(en->y + en->h >= MAP_HEIGHT * TILE_HEIGHT) return 0;
     
     return 1;
@@ -136,8 +136,8 @@ struct tile* tileDownCollision(struct entity* en, struct tile** tiles){
 struct tile** loadLevel(char* levelPath, struct entityList* l, ALLEGRO_BITMAP*** sprites){
     FILE* file = fopen(levelPath, "r");
     mustAllocate(file, levelPath);
+
     struct tile** t = (struct tile**) allocateMatrix(sizeof(struct tile), MAP_WIDTH, MAP_HEIGHT);
-    mustAllocate(t, "tiles");
 
     struct tile* newT = NULL;
     int whichSprite = 0;
@@ -181,6 +181,7 @@ struct tile** loadLevel(char* levelPath, struct entityList* l, ALLEGRO_BITMAP***
         
     }
 
+    newT = NULL;
     fclose(file);
 
     return t;
