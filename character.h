@@ -10,7 +10,8 @@
 #define BIG_HEIGHT 60 // Altura do personagem grande 
 
 #define CHARACTER_SPEED 4.0
-#define JUMP_VELOCITY -15.0;
+#define JUMP_VELOCITY -15.0
+#define MINI_BOUNCE_SPEED -5.0
 
 struct character {
     struct entity* self;

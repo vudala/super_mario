@@ -61,7 +61,6 @@ int entityDownCollision(struct entity* en1, struct entity* en2){
     return 0;
 }
 
-
 int isDead(struct entity* en){
     if(en->lifeSpan == 0 || en->life == 0)
         return 1;
@@ -115,7 +114,7 @@ void fireballsUpdate(struct entityList* fireballs, struct tile** tiles){
 
 void updateEntity(struct entity* en, struct tile** tiles){
     en->lifeSpan -= 1;
-    int whichSpeed = en->type == FIREBALL ? FIREBALL_SPEED : ENTITY_SPEED;
+    int whichSpeed = en->type == FIREBALL || en->type == SHELL ? FAST_SPEED : SLOW_SPEED;
     switch(en->behavior){
         case BOUNCING:
             if(en->dir) en->dx = whichSpeed;
@@ -124,7 +123,7 @@ void updateEntity(struct entity* en, struct tile** tiles){
             en->dy += GRAVITY;
 
             if(tileDownCollision(en, tiles)) 
-                en->dy = en->type == FIREBALL ? FIREBALL_BOUNCE : ENTITY_BOUNCE;
+                en->dy = en->type == FIREBALL ? LOW_BOUNCE : HIGH_BOUNCE;
 
             tileUpCollision(en, tiles);
             // Se bateu em algo troca de direção

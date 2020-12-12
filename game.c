@@ -52,6 +52,7 @@ int gamePlay(int* score, ALLEGRO_BITMAP** screens, ALLEGRO_SAMPLE** samples){
     
     ALLEGRO_BITMAP*** entitySprites = loadEntitySprites();
     ALLEGRO_BITMAP** tileSprite = loadTileSprites();
+    ALLEGRO_BITMAP* background = al_load_bitmap("resources/sprites/background.png");
 
     struct entityList* entities = malloc(sizeof(struct entityList));
     mustInit(entities, "entities");
@@ -117,7 +118,7 @@ int gamePlay(int* score, ALLEGRO_BITMAP** screens, ALLEGRO_SAMPLE** samples){
             case ALLEGRO_EVENT_KEY_DOWN:
                 key[event.keyboard.keycode] = KEY_SEEN | KEY_RELEASED;
                 if(key[ALLEGRO_KEY_H]) // Se apertou H, desenha a tela de ajuda
-                    drawScreen(screens, HELP_SCREEN, samples, score);
+                    drawScreen(screens, HELP_SCREEN, samples, NULL);
                 break;
             case ALLEGRO_EVENT_KEY_UP:
                 key[event.keyboard.keycode] &= KEY_RELEASED;
@@ -136,6 +137,7 @@ int gamePlay(int* score, ALLEGRO_BITMAP** screens, ALLEGRO_SAMPLE** samples){
             al_clear_to_color(al_map_rgb(127, 127, 127));
 
             // Desenha o mapa
+            al_draw_bitmap(background, 0, 0, 0);
             drawTiles(tiles, tileSprite, &offset);
 
             // Pintar de branco não interfere na cor

@@ -17,11 +17,12 @@ typedef enum {
 
 #define GRAVITY 0.5
 
-#define FIREBALL_BOUNCE -6.0
-#define FIREBALL_SPEED 8.0
 
-#define ENTITY_BOUNCE -12.0
-#define ENTITY_SPEED 3.0
+#define FAST_SPEED 8.0
+#define SLOW_SPEED 3.0
+
+#define HIGH_BOUNCE -12.0
+#define LOW_BOUNCE -6.0
 
 #define COIN_SCORE 100 // Pontos ganhos para cada moeda que pegar
 #define KILL_SCORE 250 // Pontos ganhos para cada inimigo que matar
@@ -89,6 +90,12 @@ int entityCollision(struct entity* en1, struct entity* en2);
 
 // Checa colisão com a entidade de baixo
 int entityDownCollision(struct entity* en1, struct entity* en2);
+
+// Checa colisão com a entidade a direita
+int entityLeftCollision(struct entity* en1, struct entity* en2);
+
+// Checa colisão com a entidade a esquerda
+int entityRightCollision(struct entity* en1, struct entity* en2);
 
 // Atualiza o estado de uma entidade qualquer
 void updateEntity(struct entity* en, struct tile** tiles);
