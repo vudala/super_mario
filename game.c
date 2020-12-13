@@ -47,9 +47,9 @@ void updateCameraOffset(int* offset, struct character* character){
     // Se bater na borda esquerda desloca um valor constante
     if(*offset > -TILE_WIDTH)
         *offset = -TILE_WIDTH;
-     // Se bater na borda direita desloca um valor constante
-    else if (character->self->x + (VIRTUAL_WIDTH / 2) > (TILE_WIDTH) * (MAP_WIDTH - 1))
-        *offset = -(TILE_WIDTH * (MAP_WIDTH - 1) - VIRTUAL_WIDTH);
+     // Se bater na borda direita desloca um valor constante para escondê-la
+    else if (character->self->x + (VIRTUAL_WIDTH / 2) > (TILE_WIDTH) * (MAP_WIDTH - 2))
+        *offset = -(TILE_WIDTH * (MAP_WIDTH - 2) - VIRTUAL_WIDTH);
 }
 
 int gamePlay(int* score, ALLEGRO_BITMAP** screens, ALLEGRO_SAMPLE** samples, ALLEGRO_AUDIO_STREAM** tracks){
@@ -96,8 +96,7 @@ int gamePlay(int* score, ALLEGRO_BITMAP** screens, ALLEGRO_SAMPLE** samples, ALL
                 // Se colidiu com outra entidade inimiga sem matá-la, termina o jogo
                 if(entitiesInteract(character, tiles, entities, fireballs, samples, score)){
                     al_detach_audio_stream(tracks[GAME_TRACK]); // Para a música
-                    al_play_sample(samples[DEATH_SAMPLE], 1.0, 1.0, 1.0, ALLEGRO_PLAYMODE_ONCE, 0);
-                    sleep(1);
+                    sleep(2); // Espera um pouco
                     newState = drawEnd(screens, samples, tracks, score);
                     done = true;
                     break;

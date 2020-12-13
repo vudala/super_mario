@@ -78,6 +78,7 @@ struct entityList* fireballs){
                 struct tile* aux = tileUpCollision(character->self, tiles);
                 if (aux) switch(aux->type){
                     case COIN_BLOCK:case STAR_BLOCK:case MUSHROOM_BLOCK:case FLOWER_BLOCK:
+                    case SECRET_BLOCK:
                             rValue = aux;
                 }        
             }
@@ -147,6 +148,9 @@ ALLEGRO_SAMPLE** samples, struct entityList* fireballs, int* score){
 
                 t->content -= 1;
                 break;
+            case SECRET_BLOCK:
+                al_play_sample(samples[SECRET_SAMPLE], 1.0, 0.0, 1.0, ALLEGRO_PLAYMODE_ONCE, NULL);
+                break;
         }
     }
 
@@ -203,6 +207,7 @@ ALLEGRO_SAMPLE** samples, int* score){
     struct entity* newEn = NULL;
     switch(current->en->type){
         case CHECKPOINT: // Se for o checkpoint, termina o jogo
+            al_play_sample(samples[CHECKPOINT_SAMPLE], 15.0, 1.0, 1.0, ALLEGRO_PLAYMODE_ONCE, 0);
             return 1;
         case MUSHROOM: case FLOWER: case STAR:// Se for um power up, da poder ao personagem
             givePower(character, current->en->type, samples, score);
@@ -252,8 +257,11 @@ ALLEGRO_SAMPLE** samples, int* score){
                 character->invincibility = HIT_SPAN;
                 givePower(character, NO_POWER, samples, NULL);
             } // Do contrário tomou um hit, acaba o jogo
-            else
+            else{
+                al_play_sample(samples[DEATH_SAMPLE], 1.0, 1.0, 1.0, ALLEGRO_PLAYMODE_ONCE, 0);
                 return 1;
+            }
+                
                 
             break;
     }

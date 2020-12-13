@@ -1,7 +1,7 @@
 #ifndef LEVEL_INCLUDED
 #define LEVEL_INCLUDED
 
-#define MAP_WIDTH 234 // Quantas tiles tem na horizontal
+#define MAP_WIDTH 235 // Quantas tiles tem na horizontal
 #define MAP_HEIGHT 16 // Quantas tiles tem na vertical
 #define TILE_WIDTH 40 // Largura de cada tile
 #define TILE_HEIGHT 40 // Altura de cada tile
@@ -23,7 +23,8 @@ typedef enum {
     COIN_BLOCK = 'c',
     STAR_BLOCK = 's',
     MUSHROOM_BLOCK = 'm',
-    FLOWER_BLOCK = 'f'
+    FLOWER_BLOCK = 'f',
+    SECRET_BLOCK = 'K',
 } TilesType;
 
 struct tile {

@@ -32,6 +32,12 @@ ALLEGRO_SAMPLE** loadSamples(){
     samples[DEATH_SAMPLE] = al_load_sample("resources/sounds/samples/death.wav");
     mustInit(samples[DEATH_SAMPLE], "DEATH_SAMPLE");
 
+    samples[CHECKPOINT_SAMPLE] = al_load_sample("resources/sounds/samples/checkpoint.wav");
+    mustInit(samples[CHECKPOINT_SAMPLE], "CHECKPOINT_SAMPLE");
+
+    samples[SECRET_SAMPLE] = al_load_sample("resources/sounds/samples/secret.wav");
+    mustInit(samples[SECRET_SAMPLE], "SECRET_SAMPLE");
+
     return samples;
 }
 
