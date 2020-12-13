@@ -245,7 +245,7 @@ ALLEGRO_SAMPLE** samples, ALLEGRO_AUDIO_STREAM** tracks, int* score){
     
     switch(current->en->type){
         case CHECKPOINT: // Se for o checkpoint, termina o jogo
-            al_play_sample(samples[CHECKPOINT_SAMPLE], 15.0, 1.0, 1.0, ALLEGRO_PLAYMODE_ONCE, 0);
+            al_play_sample(samples[CHECKPOINT_SAMPLE], 20.0, 1.0, 1.0, ALLEGRO_PLAYMODE_ONCE, 0);
             return 1;
         case MUSHROOM: case FLOWER: case STAR:// Se for um power up, da poder ao personagem
             givePower(character, current->en->type, samples, tracks, score);
