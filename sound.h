@@ -3,7 +3,7 @@
 
 #include "game.h"
 
-#define SAMPLES_N 8 // Quantas samples tem
+#define SAMPLES_N 9 // Quantas samples tem
 typedef enum {
     JUMP_SAMPLE = 0,
     BOUNCE_SAMPLE,
@@ -12,7 +12,8 @@ typedef enum {
     FIREBALL_SAMPLE,
     SELECT_SAMPLE,
     UNPOWER_SAMPLE,
-    HIT_SAMPLE
+    HIT_SAMPLE,
+    DEATH_SAMPLE
 } SamplesIndex;
 
 #define TRACKS_N 2 // Quantas tracks tem

@@ -1,7 +1,7 @@
 #ifndef LEVEL_INCLUDED
 #define LEVEL_INCLUDED
 
-#define MAP_WIDTH 337 // Quantas tiles tem na horizontal
+#define MAP_WIDTH 234 // Quantas tiles tem na horizontal
 #define MAP_HEIGHT 16 // Quantas tiles tem na vertical
 #define TILE_WIDTH 40 // Largura de cada tile
 #define TILE_HEIGHT 40 // Altura de cada tile

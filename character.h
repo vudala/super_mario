@@ -9,9 +9,9 @@
 #define BIG_WIDTH 40 // Largura do personagem grande
 #define BIG_HEIGHT 60 // Altura do personagem grande 
 
-#define CHARACTER_SPEED 4.0
-#define JUMP_VELOCITY -15.0
-#define FIREBALL_COOLDOWN 30
+#define CHARACTER_SPEED 4.0 // Velocidade do personagem
+#define JUMP_VELOCITY -15.0 // Velocidade de pulo
+#define FIREBALL_COOLDOWN 30 // Tempo de recarga da bola de fogo
 
 struct character {
     struct entity* self; // Os atributos comuns de uma entidade

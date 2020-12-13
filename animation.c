@@ -286,6 +286,7 @@ int drawEnd(ALLEGRO_BITMAP** screens, ALLEGRO_SAMPLE** samples, ALLEGRO_AUDIO_ST
     // Reseta todas as teclas apertadas
     for(int i = 0; i < ALLEGRO_KEY_MAX; i++) key[i] = 0;
 
+    al_detach_audio_stream(tracks[END_TRACK]);
     return newState;
 }
 

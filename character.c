@@ -120,8 +120,6 @@ struct entityList* fireballs){
     return rValue;
 }
 
-/* Realiza a interação do personagem com as tiles,
-retorna uma nova entidade caso seja um bloco especial */
 struct entity* tilesInteract(struct character* character, struct tile** tiles,
 ALLEGRO_SAMPLE** samples, struct entityList* fireballs, int* score){
     struct entity* newEn = NULL;
@@ -221,11 +219,12 @@ ALLEGRO_SAMPLE** samples, int* score){
                     case TURTLE: // Se for tartaruga cria um casco
                         newEn = newEntity(
                             SHELL, current->en->x, current->en->y,
-                            current->en->w, current->en->h,
+                            current->en->w, current->en->h / 2,
                             current->en->dir,
-                            newAnimation(SHELL_SPRITE, WALK_START, WALK_END, WALK_DURATION),
+                            newAnimation(SHELL_SPRITE, 0, FRAMES_N-1, WALK_DURATION),
                             INFINITE
                         );
+                        newEn->dy += GRAVITY;
                         insertEntity(entities, newEn);
                     default: // Mata a entidade
                         *score += KILL_SCORE;
@@ -264,6 +263,9 @@ ALLEGRO_SAMPLE** samples, int* score){
 
 int entitiesInteract(struct character* character, struct tile** tiles, struct entityList* entities,
 struct entityList* fireballs, ALLEGRO_SAMPLE** samples, int* score){
+    if(character->self->y + character->self->h > VIRTUAL_HEIGHT)
+        return 1;
+
     fireballsUpdate(fireballs, tiles);
 
     struct entityNode* current = NULL;

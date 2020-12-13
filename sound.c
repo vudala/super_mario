@@ -29,6 +29,9 @@ ALLEGRO_SAMPLE** loadSamples(){
     samples[HIT_SAMPLE] = al_load_sample("resources/sounds/samples/hit.wav");
     mustInit(samples[HIT_SAMPLE], "HIT_SAMPLE");
 
+    samples[DEATH_SAMPLE] = al_load_sample("resources/sounds/samples/death.wav");
+    mustInit(samples[DEATH_SAMPLE], "DEATH_SAMPLE");
+
     return samples;
 }
 
