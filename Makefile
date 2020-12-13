@@ -1,39 +1,43 @@
+# GRR20195689 Eduardo Vudala Senoski
 
+# Compiler and it's settings
 CC = gcc
-CFLAGS = -Wall -std=c99
-OBJECTS = main.o game.o level.o entity.o utils.o animation.o entity_list.o character.o sound.o
+CFLAGS = -Wall -std=c99 -g
 LIBS = -lallegro_font -lallegro_image -lallegro_primitives -lallegro -lallegro_audio -lallegro_acodec -lm
+
+# Inputs and outputs for the compiler
+OBJECTS = main.o game.o level.o entity.o utils.o animation.o entity_list.o character.o sound.o
 OUTPUT = game
 
 all: $(OBJECTS)
 	$(CC) $(CFLAGS) $(OBJECTS) -o $(OUTPUT) $(LIBS)
 
 main.o: main.c
-	$(CC) $(CFLAGS) -g -c main.c 
+	$(CC) $(CFLAGS) -c main.c 
 
 game.o: game.c
-	$(CC) $(CFLAGS) -g -c game.c 
+	$(CC) $(CFLAGS) -c game.c 
 
 level.o: level.c
-	$(CC) $(CFLAGS) -g -c level.c 
+	$(CC) $(CFLAGS) -c level.c 
 
 entity.o: entity.c
-	$(CC) $(CFLAGS) -g -c entity.c
+	$(CC) $(CFLAGS) -c entity.c
 
 entity_list.o: entity_list.c
-	$(CC) $(CFLAGS) -g -c entity_list.c
+	$(CC) $(CFLAGS) -c entity_list.c
 
 utils.o: utils.c
-	$(CC) $(CFLAGS) -g -c utils.c
+	$(CC) $(CFLAGS) -c utils.c
 
 animation.o: animation.c
-	$(CC) $(CFLAGS) -g -c animation.c
+	$(CC) $(CFLAGS) -c animation.c
 
 character.o: character.c
-	$(CC) $(CFLAGS) -g -c character.c
+	$(CC) $(CFLAGS) -c character.c
 
 sound.o: sound.c
-	$(CC) $(CFLAGS) -g -c sound.c
+	$(CC) $(CFLAGS) -c sound.c
 
 
 clean:

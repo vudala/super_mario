@@ -1,9 +1,11 @@
+// GRR20195689 Eduardo Vudala Senoski
+
 #ifndef ENTITYLIST_INCLUDED
 #define ENTITYLIST_INCLUDED
 
 struct entityNode {
     int id; // Chave de identificação
-    struct entity* en; // Valor
+    struct entity* en; // Entidade
     struct entityNode* next; // Pŕoximo nodo
 };
 
@@ -27,5 +29,10 @@ int insertEntity(struct entityList* l, struct entity* en);
 
 // Remove um nodo da lista
 int removeEntity(int id, struct entityList *l);
+
+/* Itera sobre a lista e aplica uma função envolvendo duas entidades, retorna o id do nodo
+no qual a função aplicada sobre en e um nodo qualquer da lista retorna true,
+caso nenhuma delas retorne true, retorna -1*/
+int listIterate(int (func) (struct entity*, struct entity*), struct entityList* l, struct entity* en);
 
 #endif

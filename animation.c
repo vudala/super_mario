@@ -1,3 +1,5 @@
+// GRR20195689 Eduardo Vudala Senoski
+
 #include "animation.h"
 #include "entity.h"
 #include "utils.h"
@@ -12,6 +14,7 @@
 ALLEGRO_BITMAP** loadSprite(char* path, int frames_n){
     ALLEGRO_BITMAP* mainBitmap = al_load_bitmap(path);
    
+    // Captura as dimensoes que deve ter cada sub bitmap
     int width = al_get_bitmap_width(mainBitmap);
     int height = al_get_bitmap_height(mainBitmap);
     int frameWidth = width / frames_n;
@@ -21,6 +24,7 @@ ALLEGRO_BITMAP** loadSprite(char* path, int frames_n){
 
     ALLEGRO_BITMAP* subBitmap = NULL;
 
+    // Copia os conteudos de cada pedaço pra uma nova bitmap
     for(int i = 0; i < frames_n; i++){
         subBitmap = al_create_sub_bitmap(mainBitmap, i * frameWidth, 0, frameWidth, height);
         mustAllocate(subBitmap, path);
@@ -37,16 +41,16 @@ ALLEGRO_BITMAP** loadScreens(){
     mustAllocate(screens, "screens");
 
     screens[START_SCREEN] = al_load_bitmap("resources/sprites/screens/start.png");
-    mustAllocate(screens[START_SCREEN], "start screen");
+    mustAllocate(screens[START_SCREEN], "START_SCREEN");
 
     screens[HELP_SCREEN] = al_load_bitmap("resources/sprites/screens/help.png");
-    mustAllocate(screens[HELP_SCREEN],"help screen");
+    mustAllocate(screens[HELP_SCREEN],"HELP_SCREEN");
     
     screens[SCORES_SCREEN] = al_load_bitmap("resources/sprites/screens/scores.png");
-    mustAllocate(screens[SCORES_SCREEN],"scores screen");
+    mustAllocate(screens[SCORES_SCREEN],"SCORES_SCREEN");
 
     screens[BACKGROUND_SCREEN] = al_load_bitmap("resources/sprites/screens/background.png");
-    mustAllocate(screens[BACKGROUND_SCREEN],"background screen");
+    mustAllocate(screens[BACKGROUND_SCREEN],"BACKGROUND_SCREEN");
 
     return screens;
 }
@@ -63,19 +67,42 @@ ALLEGRO_BITMAP** loadTileSprites(){
 ALLEGRO_BITMAP*** loadEntitySprites(){
     ALLEGRO_BITMAP*** sprites = calloc(ENTITY_SPRITES_N, sizeof(ALLEGRO_BITMAP**));
     mustAllocate(sprites, "sprites");
-    // DA PRA MELHORA ISSO AQUI --------------------------------------------------
+    
     sprites[CHAR_SPRITE] = loadSprite("resources/sprites/entities/mario.png" , FRAMES_N);
+    mustAllocate(sprites[CHAR_SPRITE], "CHAR_SPRITE");
+
     sprites[SMALL_CHAR_SPRITE] = loadSprite("resources/sprites/entities/mario_small.png", FRAMES_N);
+    mustAllocate(sprites[CHAR_SPRITE], "CHAR_SPRITE");
+
     sprites[CHAR_FLOWER_SPRITE] = loadSprite("resources/sprites/entities/mario_flower.png", FRAMES_N);
+    mustAllocate(sprites[CHAR_SPRITE], "CHAR_SPRITE");
+
     sprites[GOOMBA_SPRITE] = loadSprite("resources/sprites/entities/goomba.png", FRAMES_N);
+    mustAllocate(sprites[GOOMBA_SPRITE], "GOOMBA_SPRITE");
+
     sprites[TURTLE_SPRITE] = loadSprite("resources/sprites/entities/turtle.png", FRAMES_N);
+    mustAllocate(sprites[TURTLE_SPRITE], "TURTLE_SPRITE");
+
     sprites[FLOWER_SPRITE] = loadSprite("resources/sprites/entities/flower.png", FRAMES_N);
+    mustAllocate(sprites[FLOWER_SPRITE], "FLOWER_SPRITE");
+    
     sprites[STAR_SPRITE] = loadSprite("resources/sprites/entities/star.png", FRAMES_N);
+    mustAllocate(sprites[STAR_SPRITE], "STAR_SPRITE");
+
     sprites[SHELL_SPRITE] = loadSprite("resources/sprites/entities/shell.png", FRAMES_N);
+    mustAllocate(sprites[SHELL_SPRITE], "SHELL_SPRITE");
+
     sprites[MUSHROOM_SPRITE] = loadSprite("resources/sprites/entities/mushroom.png", FRAMES_N);
+    mustAllocate(sprites[MUSHROOM_SPRITE], "MUSHROOM_SPRITE");
+
     sprites[COIN_SPRITE] = loadSprite("resources/sprites/entities/coin.png", FRAMES_N);
+    mustAllocate(sprites[COIN_SPRITE], "COIN_SPRITE");
+
     sprites[FIREBALL_SPRITE] = loadSprite("resources/sprites/entities/fireball.png", FRAMES_N);
+    mustAllocate(sprites[FIREBALL_SPRITE], "FIREBALL_SPRITE");
+
     sprites[CHECKPOINT_SPRITE] = loadSprite("resources/sprites/entities/checkpoint.png", FRAMES_N);
+    mustAllocate(sprites[CHECKPOINT_SPRITE], "CHECKPOINT_SPRITE");
 
     return sprites;
 }

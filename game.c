@@ -1,3 +1,5 @@
+// GRR20195689 Eduardo Vudala Senoski
+
 #include "game.h"
 #include "level.h"
 #include "entity.h"
@@ -81,6 +83,7 @@ int gamePlay(int* score, ALLEGRO_BITMAP** screens, ALLEGRO_SAMPLE** samples, ALL
     bool done = false;
     bool redraw = true;
     int newState = DESTROY;
+    struct tile* t = NULL;
 
     int offset = 0;
     struct entity* newEn = NULL;
@@ -89,12 +92,12 @@ int gamePlay(int* score, ALLEGRO_BITMAP** screens, ALLEGRO_SAMPLE** samples, ALL
         al_wait_for_event(queue, &event);
         switch(event.type){
             case ALLEGRO_EVENT_TIMER:
-                // Se bateu em uma tile especial, cria uma nova entidade
-                newEn = tilesInteract(character, tiles, samples, fireballs, score);
+                t = updateCharacter(character, tiles, fireballs, samples, tracks);
+                newEn = tileInteract(character, t, samples, score);
                 if(newEn) insertEntity(entities, newEn);
 
                 // Se colidiu com outra entidade inimiga sem matá-la, termina o jogo
-                if(entitiesInteract(character, tiles, entities, fireballs, samples, score)){
+                if(entitiesInteract(character, tiles, entities, fireballs, samples, tracks, score)){
                     al_detach_audio_stream(tracks[GAME_TRACK]); // Para a música
                     sleep(2); // Espera um pouco
                     newState = drawEnd(screens, samples, tracks, score);
@@ -162,15 +165,31 @@ int gamePlay(int* score, ALLEGRO_BITMAP** screens, ALLEGRO_SAMPLE** samples, ALL
     // Destroi as estruturas
     for(int i = 0; i < TILES_N; i++) al_destroy_bitmap(tileSprite[i]);
     free(tileSprite);
+    tileSprite = NULL;
+
     free(tiles[0]);
     free(tiles);
+    tiles = NULL;
+
     destroyEntity(character->self);
+    free(character);
+    character = NULL;
+
     destroyList(entities);
+    entities = NULL;
+
+    destroyList(fireballs);
+    fireballs = NULL;
     
-    for(int i = 0; i < ENTITY_SPRITES_N; i++)
+    for(int i = 0; i < ENTITY_SPRITES_N; i++){
         for(int j = 0; j < FRAMES_N; j++)
             al_destroy_bitmap(entitySprites[i][j]);
-    
+        free(entitySprites[i]);
+    }
+    free(entitySprites);    
+    entitySprites = NULL;
+            
+    *score = 0;
 
     return newState;
 }
@@ -178,17 +197,14 @@ int gamePlay(int* score, ALLEGRO_BITMAP** screens, ALLEGRO_SAMPLE** samples, ALL
 void gameDestroy(ALLEGRO_BITMAP** screens, ALLEGRO_SAMPLE** samples, ALLEGRO_AUDIO_STREAM** tracks){
     for(int i = 0; i < SAMPLES_N; i++)
         al_destroy_sample(samples[i]);
-
     free(samples);
 
     for(int i = 0; i < SCREENS_N; i++)
         al_destroy_bitmap(screens[i]);
-
     free(screens);
 
     for(int i = 0; i < TRACKS_N; i++)
         al_destroy_audio_stream(tracks[i]);
-
     free(tracks);
     
     al_destroy_display(disp);

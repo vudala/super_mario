@@ -1,3 +1,5 @@
+// GRR20195689 Eduardo Vudala Senoski
+
 #ifndef ENTITY_INCLUDED
 #define ENTITY_INCLUDED
 
@@ -74,20 +76,15 @@ struct entity {
     struct animation* anim; // Animação
 };
 
+
+// Libera o espaço de memória ocupado pela entidade
+void destroyEntity(struct entity* en);
+
 // Cria uma nova entidade
 struct entity* newEntity(int type, int x, int y, int w, int h, int dir, struct animation* anim, int lSpan);
 
 // Verifica se uma entidade está morta
 int isDead(struct entity* en);
-
-// Adiciona uma fireball a frente de en
-void addFireball(struct entityList* fireballs, struct entity* en);
-
-// Verifica se alguma fireball bateu na entidade
-int fireballHit(struct entityList* fireballs, struct entity* en);
-
-// Atualiza o estado e posição das fireballs
-void fireballsUpdate(struct entityList* fireballs, struct tile** tiles);
 
 // Checa colisão entre duas entidades
 int entityCollision(struct entity* en1, struct entity* en2);
@@ -95,17 +92,19 @@ int entityCollision(struct entity* en1, struct entity* en2);
 // Checa colisão com a entidade de baixo
 int entityDownCollision(struct entity* en1, struct entity* en2);
 
-// Checa colisão com a entidade a direita
-int entityLeftCollision(struct entity* en1, struct entity* en2);
+// Adiciona uma fireball a frente de en
+void addFireball(struct entityList* fireballs, struct entity* en);
 
-// Checa colisão com a entidade a esquerda
-int entityRightCollision(struct entity* en1, struct entity* en2);
+// Verifica se alguma fireball bateu na entidade
+int fireballHit(struct entityList* fireballs, struct entity* en);
+
+// Verifica se o casco colidiu com essa entidade
+int shellHit(struct entity* shell, struct entity* en);
+
+// Atualiza o estado e posição das fireballs
+void fireballsUpdate(struct entityList* fireballs, struct tile** tiles);
 
 // Atualiza o estado de uma entidade qualquer
 void updateEntity(struct entity* en, struct tile** tiles);
-
-// Libera o espaço de memória ocupado pela entidade
-void destroyEntity(struct entity* en);
-
 
 #endif

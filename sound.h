@@ -18,10 +18,11 @@ typedef enum {
     SECRET_SAMPLE
 } SamplesIndex;
 
-#define TRACKS_N 2 // Quantas tracks tem
+#define TRACKS_N 3 // Quantas tracks tem
 typedef enum {
     GAME_TRACK = 0,
-    END_TRACK
+    END_TRACK,
+    STAR_TRACK
 } TracksIndex;
 
 // Carrega as samples

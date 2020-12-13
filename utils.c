@@ -43,9 +43,12 @@ int* getScores(int* currScore){
     mustAllocate(scores, "scores");
     
     // Armazena uma string de até 9 chars, ou seja, armazena um decimal de até 9 digitos
-    char* s = malloc(9); 
+    char* s = malloc(9);
+    mustAllocate(s, "aux string");
     for(int i = 0; fgets(s, 9, file) && i < TOP_SCORE_N; i++)
         scores[i] = atoi(s);
+    
+    free(s);
 
     // Organiza os scores em ordem decrescente
     if(scores[TOP_SCORE_N-1] < *currScore) scores[TOP_SCORE_N-1] = *currScore;
@@ -61,6 +64,7 @@ int* getScores(int* currScore){
     mustAllocate(file, "score file");
     for(int i = 1; i < TOP_SCORE_N; i++)
         fprintf(file, "%d\n", scores[i]);
+
 
     fclose(file);
 

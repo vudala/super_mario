@@ -1,3 +1,5 @@
+// GRR20195689 Eduardo Vudala Senoski
+
 #include "entity.h"
 #include "utils.h"
 #include "game.h"
@@ -89,13 +91,20 @@ int fireballHit(struct entityList* fireballs, struct entity* en){
     while(next != NULL){
         current = next;
         next = current->next;
-        // Se uma fireball bateu em um inimigo emove a fireball e retorna 1
+        // Se uma fireball bateu em um inimigo remove a fireball e retorna 1
         if(entityCollision(current->en, en) && (en->type == GOOMBA || en->type == TURTLE)){
             removeEntity(current->id, fireballs);
             return 1;
         }
     }
 
+    return 0;
+}
+
+int shellHit(struct entity* shell, struct entity* en){
+    if(en->type != SHELL && shell->behavior != IDLE && entityCollision(shell, en))
+        return 1;
+    
     return 0;
 }
 
@@ -115,56 +124,42 @@ void fireballsUpdate(struct entityList* fireballs, struct tile** tiles){
 
 void updateEntity(struct entity* en, struct tile** tiles){
     en->lifeSpan -= 1;
-    int whichSpeed = en->type == FIREBALL || en->type == SHELL ? FAST_SPEED : SLOW_SPEED;
     switch(en->behavior){
         case IDLE:
             if(!tileDownCollision(en, tiles)) 
                 en->dy += GRAVITY;
             break;
         case BOUNCING:
-            if(en->dir) en->dx = whichSpeed;
-            else en->dx = -whichSpeed;
-
             en->dy += GRAVITY;
-
             if(tileDownCollision(en, tiles)) 
                 en->dy = en->type == FIREBALL ? LOW_BOUNCE : HIGH_BOUNCE;
-
             tileUpCollision(en, tiles);
-            // Se bateu em algo troca de direção
-            if(tileLeftCollision(en, tiles) || tileRightCollision(en, tiles)){
-                en->dir = !en->dir;
-                if(en->type == FIREBALL)
-                    en->life = 0; // Se for uma bola de fogo, a elimina
-            }
-
             break;
         case JUMPING:
-            if(en->dir) en->dx = whichSpeed;
-            else en->dx = -whichSpeed;
-
             en->dy += GRAVITY;
-            
             if(tileDownCollision(en, tiles)) en->behavior = WALKING;
             tileUpCollision(en, tiles);
-            // Se bateu em algo troca de direção
-            if(tileLeftCollision(en, tiles)) en->dir = RIGHT;
-            if(tileRightCollision(en, tiles)) en->dir = LEFT;
-
             break;
         case WALKING:
-            if(en->dir) en->dx = whichSpeed;
-            else en->dx = -whichSpeed;
-
             // Se não houver tiles embaixo
             if(!tileDownCollision(en, tiles)) en->behavior = JUMPING;
-            // Se bateu em algo troca de direção
-            if(tileLeftCollision(en, tiles)) en->dir = RIGHT;
-            if(tileRightCollision(en, tiles)) en->dir = LEFT;
-
             break;
     }
     
+    // Se não estiver parada, atualiza suas velocidades e direções
+    if(en->behavior != IDLE){
+        // Atualiza para onde a entidade se move lateralmente
+        int whichSpeed = (en->type == FIREBALL || en->type == SHELL ? FAST_SPEED : SLOW_SPEED);
+        en->dx = en->dir ? whichSpeed : -whichSpeed;
+
+        // Se houve uma colisão lateral, troca de direção
+        if(tileLeftCollision(en, tiles) || tileRightCollision(en, tiles)){
+            en->dir = !en->dir;
+            if(en->type == FIREBALL)
+                en->life = 0; // Se for uma bola de fogo, a elimina
+        }
+    }
+
     en->y += en->dy;
     en->x += en->dx;
 }

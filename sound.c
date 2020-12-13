@@ -53,5 +53,9 @@ ALLEGRO_AUDIO_STREAM** loadTracks(){
     mustInit(tracks[END_TRACK], "END_TRACK");
     al_set_audio_stream_playmode(tracks[END_TRACK], ALLEGRO_PLAYMODE_LOOP);
 
+    tracks[STAR_TRACK] = al_load_audio_stream("resources/sounds/tracks/star_track.opus", 2, 2048);
+    mustInit(tracks[STAR_TRACK], "STAR_TRACK");
+    al_set_audio_stream_playmode(tracks[STAR_TRACK], ALLEGRO_PLAYMODE_LOOP);
+
     return tracks;
 }

@@ -1,3 +1,5 @@
+// GRR20195689 Eduardo Vudala Senoski
+
 #include "character.h"
 #include "utils.h"
 #include "sound.h"
@@ -14,11 +16,30 @@ struct character* newCharacter(struct entity* en){
     return newC;
 };
 
-struct tile* updateCharacter(struct character* character, struct tile** tiles, ALLEGRO_SAMPLE** samples,
-struct entityList* fireballs){
+void move(struct entity* en, int xspeed, int direction){
+    en->dir = direction ? RIGHT : LEFT;
+    en->dx = direction ? xspeed : -xspeed;
+}
+
+void walk(struct entity* en, int xspeed, int direction){
+    move(en, xspeed, direction);
+    en->behavior = WALKING;
+}
+
+void jump(struct entity* en, int yspeed){
+    en->dy = JUMP_VELOCITY;
+    en->behavior = JUMPING;
+}
+
+struct tile* updateCharacter(struct character* character, struct tile** tiles, struct entityList* fireballs,
+ALLEGRO_SAMPLE** samples, ALLEGRO_AUDIO_STREAM** tracks){
     struct tile* rValue = NULL; // Valor de retorno
     character->invincibility -= 1;
-    if(character->invincibility == 0) character->star = 0;
+    if(character->invincibility == 0) {
+        al_detach_audio_stream(tracks[STAR_TRACK]);
+        character->star = 0;
+        al_attach_audio_stream_to_mixer(tracks[GAME_TRACK], al_get_default_mixer());
+    }
 
     // Se estiver sob poder da flor e o tempo de recarga esgotado
     // Ao apertar espaço solta uma bola de fogo
@@ -32,38 +53,27 @@ struct entityList* fireballs){
     switch(character->self->behavior){
         case IDLE:  
             if (key[ALLEGRO_KEY_UP]){ // Pula
-                character->self->dy = JUMP_VELOCITY;
-                character->self->behavior = JUMPING;
+                jump(character->self, JUMP_VELOCITY);
                 al_play_sample(samples[JUMP_SAMPLE], 1.0, 0.0, 1.0, ALLEGRO_PLAYMODE_ONCE, NULL);
             }
-            else if (key[ALLEGRO_KEY_LEFT]){ // Anda pra esquerda
-                character->self->dir = LEFT;
-                character->self->dx = -CHARACTER_SPEED;
-                character->self->behavior = WALKING;
-            } 
-            else if (key[ALLEGRO_KEY_RIGHT]) { // Anda pra direita
-                character->self->dir = RIGHT;
-                character->self->dx = CHARACTER_SPEED;
-                character->self->behavior = WALKING;
-            } 
+            else if (key[ALLEGRO_KEY_LEFT])
+                walk(character->self, CHARACTER_SPEED, LEFT);
+            else if (key[ALLEGRO_KEY_RIGHT])
+                walk(character->self, CHARACTER_SPEED, RIGHT);
             else
                 character->self->dx = 0; // Para de acelerar
             
             tileUpCollision(character->self, tiles);
-            // Se colidiu lateralmente
+            // Se colidiu lateralmente impede que ande
             if(tileLeftCollision(character->self, tiles) || tileRightCollision(character->self, tiles))
                 character->self->behavior = IDLE;
 
             break;
         case JUMPING:
-            if(key[ALLEGRO_KEY_LEFT]){ // Se move para a esquerda
-                character->self->dir = LEFT;
-                character->self->dx = -CHARACTER_SPEED;
-            } 
-            else if(key[ALLEGRO_KEY_RIGHT]){ // Se move para a direita
-                character->self->dir = RIGHT;
-                character->self->dx = CHARACTER_SPEED;
-            } 
+            if(key[ALLEGRO_KEY_LEFT])
+                move(character->self, CHARACTER_SPEED, LEFT); 
+            else if(key[ALLEGRO_KEY_RIGHT])
+                move(character->self, CHARACTER_SPEED, RIGHT);
             else
                 character->self->dx = 0; // Para de acelerar
             
@@ -88,18 +98,15 @@ struct entityList* fireballs){
             
             break;
         case WALKING:
-            if (key[ALLEGRO_KEY_UP]) { // Pula 
-                character->self->dy = JUMP_VELOCITY;
-                character->self->behavior = JUMPING;
-            } 
-            else if (key[ALLEGRO_KEY_LEFT]) { // Anda a esquerda
-                character->self->dir = LEFT;
-                character->self->dx = -CHARACTER_SPEED;
-            } 
-            else if (key[ALLEGRO_KEY_RIGHT]) { // Anda a direita
-                character->self->dir = RIGHT;
-                character->self->dx = CHARACTER_SPEED;
-            } else { // Para
+            if (key[ALLEGRO_KEY_UP]){ // Pula
+                jump(character->self, JUMP_VELOCITY);
+                al_play_sample(samples[JUMP_SAMPLE], 1.0, 0.0, 1.0, ALLEGRO_PLAYMODE_ONCE, NULL);
+            }
+            else if (key[ALLEGRO_KEY_LEFT])
+                walk(character->self, CHARACTER_SPEED, LEFT);
+            else if (key[ALLEGRO_KEY_RIGHT])
+                walk(character->self, CHARACTER_SPEED, RIGHT);
+            else { // Para
                 character->self->dx = 0;
                 character->self->behavior = IDLE;
             }
@@ -121,11 +128,10 @@ struct entityList* fireballs){
     return rValue;
 }
 
-struct entity* tilesInteract(struct character* character, struct tile** tiles,
-ALLEGRO_SAMPLE** samples, struct entityList* fireballs, int* score){
-    struct entity* newEn = NULL;
-    struct tile* t = updateCharacter(character, tiles, samples, fireballs);
+struct entity* tileInteract(struct character* character, struct tile* t, ALLEGRO_SAMPLE** samples, int* score){
+    if(t == NULL) return NULL;
 
+    struct entity* newEn = NULL;
     if(t){
         if(t->content < 1) return NULL; // Se os contéudos de t ja se esgotaram
         switch (t->type){
@@ -157,7 +163,9 @@ ALLEGRO_SAMPLE** samples, struct entityList* fireballs, int* score){
     return newEn;
 }
 
-void givePower(struct character* character, int powerType, ALLEGRO_SAMPLE** samples, int* score){
+// Da um poder ao personagem, baseado no powerType
+void givePower(struct character* character, int powerType, ALLEGRO_SAMPLE** samples,
+ALLEGRO_AUDIO_STREAM** tracks, int* score){
     switch(powerType){
         case MUSHROOM_POWER:
             if(character->power == NO_POWER){
@@ -187,6 +195,8 @@ void givePower(struct character* character, int powerType, ALLEGRO_SAMPLE** samp
             character->invincibility = INVINCIBILTY;
             character->star = 1;
             al_play_sample(samples[POWERUP_SAMPLE], 1.0, 0.0, 1.0, ALLEGRO_PLAYMODE_ONCE, NULL);
+            al_detach_audio_stream(tracks[GAME_TRACK]);
+            al_attach_audio_stream_to_mixer(tracks[STAR_TRACK], al_get_default_mixer());
             break;
         
         case NO_POWER:
@@ -200,45 +210,51 @@ void givePower(struct character* character, int powerType, ALLEGRO_SAMPLE** samp
     }
 }
 
-// Realiza a interação entre o personagem e uma entidade qualquer
-// Se acabou o jogo retorna 1, do contrário 0
-int entityInteract(struct character* character, struct entityList* entities, struct entityNode* current,
+// Esmaga uma entidade
+void shatter(struct character* character, struct entityNode* current, struct entityList* entities,
 ALLEGRO_SAMPLE** samples, int* score){
     struct entity* newEn = NULL;
+    switch(current->en->type){
+        case SHELL: // Se for casco o para
+            current->en->behavior = IDLE;
+            current->en->dx = 0;
+            character->self->dy = LOW_BOUNCE;
+            break;
+        case TURTLE: // Se for tartaruga cria um casco
+            newEn = newEntity(
+                SHELL, current->en->x, current->en->y,
+                current->en->w, current->en->h / 2, current->en->dir,
+                newAnimation(SHELL_SPRITE, 0, FRAMES_N-1, WALK_DURATION),
+                INFINITE
+            );
+            newEn->dy += GRAVITY;
+            insertEntity(entities, newEn);
+        default: // Mata a entidade
+            removeEntity(current->id, entities);
+            *score += KILL_SCORE;
+            character->self->dy = HIGH_BOUNCE;
+            al_play_sample(samples[BOUNCE_SAMPLE], 1.0, 0.0, 1.0, ALLEGRO_PLAYMODE_ONCE, NULL);
+            break;
+    }
+}
+
+// Realiza a interação entre o personagem e uma entidade qualquer
+// Se acabou o jogo retorna 1, do contrário 0
+int interact(struct character* character, struct entityList* entities, struct entityNode* current,
+ALLEGRO_SAMPLE** samples, ALLEGRO_AUDIO_STREAM** tracks, int* score){
+    
     switch(current->en->type){
         case CHECKPOINT: // Se for o checkpoint, termina o jogo
             al_play_sample(samples[CHECKPOINT_SAMPLE], 15.0, 1.0, 1.0, ALLEGRO_PLAYMODE_ONCE, 0);
             return 1;
         case MUSHROOM: case FLOWER: case STAR:// Se for um power up, da poder ao personagem
-            givePower(character, current->en->type, samples, score);
+            givePower(character, current->en->type, samples, tracks, score);
             removeEntity(current->id, entities);
             break;
-        default:
-            if(entityDownCollision(character->self, current->en)){ // Se pulo em cima
-                switch(current->en->type){
-                    case SHELL: // Se for casco o para
-                        current->en->behavior = IDLE;
-                        current->en->dx = 0;
-                        character->self->dy = LOW_BOUNCE;
-                        break;
-                    case TURTLE: // Se for tartaruga cria um casco
-                        newEn = newEntity(
-                            SHELL, current->en->x, current->en->y,
-                            current->en->w, current->en->h / 2,
-                            current->en->dir,
-                            newAnimation(SHELL_SPRITE, 0, FRAMES_N-1, WALK_DURATION),
-                            INFINITE
-                        );
-                        newEn->dy += GRAVITY;
-                        insertEntity(entities, newEn);
-                    default: // Mata a entidade
-                        *score += KILL_SCORE;
-                        removeEntity(current->id, entities);
-                        character->self->dy = HIGH_BOUNCE;
-                        character->self->behavior = JUMPING;
-                        al_play_sample(samples[BOUNCE_SAMPLE], 1.0, 0.0, 1.0, ALLEGRO_PLAYMODE_ONCE, NULL);
-                        break;
-                }
+        default: // Se não for nenhum dos dois, é um inimigo
+            if(entityDownCollision(character->self, current->en)){
+                // Se pulou em cima esmaga a entidade
+                shatter(character, current, entities, samples, score);
             } // Se esbarrar num casco parado enquanto anda, o chuta
             else if(current->en->behavior == IDLE && character->self->behavior == WALKING &&
                     current->en->type == SHELL){
@@ -255,22 +271,21 @@ ALLEGRO_SAMPLE** samples, int* score){
             } // Se estiver com algum poder, perde o poder e fica brevemente invencivel
             else if (character->power != NO_POWER){
                 character->invincibility = HIT_SPAN;
-                givePower(character, NO_POWER, samples, NULL);
+                givePower(character, NO_POWER, samples, tracks, NULL);
             } // Do contrário tomou um hit, acaba o jogo
             else{
                 al_play_sample(samples[DEATH_SAMPLE], 1.0, 1.0, 1.0, ALLEGRO_PLAYMODE_ONCE, 0);
                 return 1;
             }
-                
-                
             break;
     }
 
     return 0;
-}    
+}
 
 int entitiesInteract(struct character* character, struct tile** tiles, struct entityList* entities,
-struct entityList* fireballs, ALLEGRO_SAMPLE** samples, int* score){
+struct entityList* fireballs, ALLEGRO_SAMPLE** samples, ALLEGRO_AUDIO_STREAM** tracks,  int* score){
+    // Se o personagem cair nos limites inferiores do mapa, o mata
     if(character->self->y + character->self->h > VIRTUAL_HEIGHT)
         return 1;
 
@@ -279,7 +294,7 @@ struct entityList* fireballs, ALLEGRO_SAMPLE** samples, int* score){
     struct entityNode* current = NULL;
     struct entityNode* next = entities->start; 
 
-    // Navega por todas a entidades e reaje conforme o tipo de colisão e o tipo das entidades
+    // Navega por todas a entidades e reaje conforme o tipo das entidades
     while(next != NULL){
         current = next;
         next = current->next;
@@ -292,8 +307,16 @@ struct entityList* fireballs, ALLEGRO_SAMPLE** samples, int* score){
         }
         else {
             updateEntity(current->en, tiles);
+            if(current->en->type == SHELL){
+                // Se um casco em movimento atingir alguma entidade, mata a entiade
+                int id = listIterate(shellHit, entities, current->en);
+                if(id != -1) {
+                    removeEntity(id, entities);
+                    al_play_sample(samples[HIT_SAMPLE], 1.0, 0.0, 1.0, ALLEGRO_PLAYMODE_ONCE, NULL);
+                }
+            }
             if(entityCollision(character->self, current->en))
-                return entityInteract(character, entities, current, samples, score);
+                return interact(character, entities, current, samples, tracks, score);
         }        
     }
 

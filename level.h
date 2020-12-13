@@ -1,3 +1,5 @@
+// GRR20195689 Eduardo Vudala Senoski
+
 #ifndef LEVEL_INCLUDED
 #define LEVEL_INCLUDED
 
@@ -12,7 +14,7 @@ typedef struct ALLEGRO_BITMAP ALLEGRO_BITMAP;
 struct entity;
 struct entityList;
 
-#define TILES_N 10 // Quantas tiles diferentes existem
+#define TILES_N 11 // Quantas tiles diferentes existem
 typedef enum {
     EMPTY_BLOCK = ' ',
     BRICK_BLOCK = 'b',
@@ -43,6 +45,12 @@ struct tile** loadLevel(char* levelPath, struct entityList* l, ALLEGRO_BITMAP***
 // Aponta para a tile presente naquele par de coordenadas
 struct tile* pointToTile(int x, int y, struct tile** tiles);
 
+// Verifica se esta no limite horizontal do mapa
+int withinMapWidth(struct entity* en);
+
+// Verifica se esta no limite vertical do mapa
+int withinMapHeight(struct entity* en);
+
 // Retorna o ID da entidade correspondente conteúdo do bloco : -1 se não houver nada associado a ele
 int specialTileContent(char type);
 
@@ -57,11 +65,5 @@ struct tile* tileLeftCollision(struct entity* en, struct tile** tiles);
 
 // Aponta para a tile em que há colisao a direita, do contrário retorna NULL
 struct tile* tileRightCollision(struct entity* en, struct tile** tiles);
-
-// Verifica se esta no limite horizontal do mapa
-int withinMapWidth(struct entity* en);
-
-// Verifica se esta no limite vertical do mapa
-int withinMapHeight(struct entity* en);
 
 #endif

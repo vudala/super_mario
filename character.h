@@ -1,3 +1,5 @@
+// GRR20195689 Eduardo Vudala Senoski
+
 #ifndef CHARACTER_INCLUDED
 #define CHARACTER_INCLUDED
 
@@ -27,14 +29,13 @@ struct character* newCharacter(struct entity* en);
 
 // Atualiza os atributos do personagem, com base em inputs e atributos anteriores
 struct tile* updateCharacter(struct character* character, struct tile** tiles,
-ALLEGRO_SAMPLE** samples, struct entityList* fireballs);
+struct entityList* fireballs, ALLEGRO_SAMPLE** samples, ALLEGRO_AUDIO_STREAM** tracks);
 
 // Realiza a interação entre todas as entidades, se acabou o jogo retorna 1
 int entitiesInteract(struct character* character, struct tile** tiles, struct entityList* entities,
-struct entityList* fireballs, ALLEGRO_SAMPLE** samples, int* score);
+struct entityList* fireballs, ALLEGRO_SAMPLE** samples, ALLEGRO_AUDIO_STREAM** tracks, int* score);
 
-// Realiza a interação do personagem com o terreno
-struct entity* tilesInteract(struct character* character, struct tile** tiles, ALLEGRO_SAMPLE** samples,
-struct entityList* fireballs, int* score);
+// Realiza a interação do personagem com aquela tile
+struct entity* tileInteract(struct character* character, struct tile* tile, ALLEGRO_SAMPLE** samples, int* score);
 
 #endif

@@ -1,6 +1,7 @@
+// GRR20195689 Eduardo Vudala Senoski
+
 #include "entity_list.h"
 #include "entity.h"
-
 #include "entity_list.h"
 #include "utils.h"
 
@@ -76,6 +77,7 @@ int removeEntity(int id, struct entityList *l){
     while(current != NULL){
         if(current->id == id){
             last->next = current->next;
+            destroyEntity(current->en);
             free(current);
             l->size--;
             return 1;
@@ -84,4 +86,18 @@ int removeEntity(int id, struct entityList *l){
         current = current->next;
     }
     return 0;
+}
+
+int listIterate(int (func) (struct entity*, struct entity*), struct entityList* l, struct entity* en){
+    struct entityNode* current = NULL;
+    struct entityNode* next = l->start; 
+
+    while(next != NULL){
+        current = next;
+        next = current->next;
+        if(func(en, current->en))
+            return current->id;
+    }
+
+    return -1;
 }
