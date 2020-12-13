@@ -1,12 +1,20 @@
 #include "entity_list.h"
 #include "entity.h"
 
+#include "entity_list.h"
+#include "utils.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 
-void createList(struct entityList* l){
+struct entityList* newList(){
+    struct entityList* l = malloc(sizeof(struct entityList));
+    mustAllocate(l, "list");
+
     l->size = 0;
     l->start = NULL;
+
+    return l;
 }
 
 int isEmpty(struct entityList* l){

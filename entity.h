@@ -17,12 +17,15 @@ typedef enum {
 
 #define GRAVITY 0.5
 
-
 #define FAST_SPEED 8.0
 #define SLOW_SPEED 3.0
 
 #define HIGH_BOUNCE -12.0
 #define LOW_BOUNCE -6.0
+
+#define FIREBALL_SIZE 20
+#define FIREBALL_SPAN 120
+#define INFINITE -1
 
 #define COIN_SCORE 100 // Pontos ganhos para cada moeda que pegar
 #define KILL_SCORE 250 // Pontos ganhos para cada inimigo que matar
@@ -78,7 +81,7 @@ struct entity* newEntity(int type, int x, int y, int w, int h, int dir, struct a
 int isDead(struct entity* en);
 
 // Adiciona uma fireball a frente de en
-void addFireball(struct entityList* fireballs, struct entity* en, ALLEGRO_BITMAP*** sprites);
+void addFireball(struct entityList* fireballs, struct entity* en);
 
 // Verifica se alguma fireball bateu na entidade
 int fireballHit(struct entityList* fireballs, struct entity* en);

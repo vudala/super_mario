@@ -21,16 +21,17 @@ ALLEGRO_EVENT event;
 unsigned char key[ALLEGRO_KEY_MAX];
 
 typedef enum {
-    INIT = 0,
-    PLAY,
-    ENDING,
+    PLAY = 0,
     DESTROY
 } GameStates;
 
+// Inicia as estruturas do Allegro
 void gameInit();
 
-int gamePlay(int* score, ALLEGRO_BITMAP** screens, ALLEGRO_SAMPLE** samples);
+// Joga o jogo
+int gamePlay(int* score, ALLEGRO_BITMAP** screens, ALLEGRO_SAMPLE** samples, ALLEGRO_AUDIO_STREAM** tracks);
 
-void gameDestroy();
+// Destrói as estruturas do Allegro
+void gameDestroy(ALLEGRO_BITMAP** screens, ALLEGRO_SAMPLE** samples, ALLEGRO_AUDIO_STREAM** tracks);
 
 #endif

@@ -9,12 +9,13 @@ int main(){
 
     ALLEGRO_BITMAP** screens = loadScreens();
     ALLEGRO_SAMPLE** samples = loadSamples();
+    ALLEGRO_AUDIO_STREAM** tracks = loadTracks();
 
-    int gameState = drawScreen(screens, START_SCREEN, samples, NULL);
+    int gameState = drawScreen(screens, START_SCREEN, samples, tracks);
     for(;;) switch(gameState){
-        case PLAY: gameState = gamePlay(&score, screens, samples); break;
+        case PLAY: gameState = gamePlay(&score, screens, samples, tracks); break;
         case DESTROY:
-            gameDestroy(screens, samples);
+            gameDestroy(screens, samples, tracks);
             return 0;
             break;
     }

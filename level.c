@@ -1,9 +1,6 @@
 #include "level.h"
 #include "utils.h"
-#include "entity.h"
-#include "entity_list.h"
 #include "animation.h"
-#include "game.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -158,8 +155,12 @@ struct tile** loadLevel(char* levelPath, struct entityList* l, ALLEGRO_BITMAP***
                 width = al_get_bitmap_width(sprites[whichSprite][0]);
                 height = al_get_bitmap_height(sprites[whichSprite][0]);
                 insertEntity(l,
-                    newEntity(c, j*TILE_WIDTH, i*TILE_HEIGHT, width, height, RIGHT, 
-                        newAnimation(whichSprite), -1
+                    newEntity(
+                        c, j*TILE_WIDTH, i*TILE_HEIGHT, width, height, RIGHT, 
+                        newAnimation(
+                            whichSprite, WALK_START, WALK_END, WALK_DURATION
+                        ),
+                        INFINITE
                     )
                 );
                 newT = newTile( j * TILE_WIDTH, i * TILE_HEIGHT, TILE_WIDTH, TILE_HEIGHT, 0, EMPTY_BLOCK);

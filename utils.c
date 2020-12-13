@@ -7,7 +7,9 @@ void** allocateMatrix(int size, long int width, long int height){
     void** m;
 
     m = calloc(height, size);
+    mustAllocate(m, "matrix");
     m[0] = calloc(height * width, size);
+    mustAllocate(m[0], "matrix");
     for (int i=1; i < height; i++)
         m[i] = m[0] + i * width * size;
 
@@ -28,7 +30,7 @@ void mustAllocate(void* ptr, char* str){
     }
 }
 
-// Funcao utilizada para ordenar o vetor de scores
+// Funcao utilizada para ordenar o vetor de scores em ordem decrescente
 int cmpfunc (const void * a, const void * b) {
    return ( *(int*)b - *(int*)a);
 }

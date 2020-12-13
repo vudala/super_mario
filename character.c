@@ -9,14 +9,25 @@ struct character* newCharacter(struct entity* en){
 
     // Os outros atributos já vem como 0, por causa do calloc
     newC->self = en;
+    newC->skillCooldown = FIREBALL_COOLDOWN;
 
     return newC;
 };
 
-struct tile* updateCharacter(struct character* character, struct tile** tiles, ALLEGRO_SAMPLE** samples){
+struct tile* updateCharacter(struct character* character, struct tile** tiles, ALLEGRO_SAMPLE** samples,
+struct entityList* fireballs){
     struct tile* rValue = NULL; // Valor de retorno
     character->invincibility -= 1;
     if(character->invincibility == 0) character->star = 0;
+
+    // Se estiver sob poder da flor e o tempo de recarga esgotado
+    // Ao apertar espaço solta uma bola de fogo
+    if (key[ALLEGRO_KEY_SPACE] && character->currClock < 1 && character->power == FLOWER_POWER){
+        character->currClock = character->skillCooldown;
+        addFireball(fireballs, character->self);
+        al_play_sample(samples[FIREBALL_SAMPLE], 1.0, 0.0, 1.0, ALLEGRO_PLAYMODE_ONCE, NULL);
+    }
+    character->currClock -= 1;
 
     switch(character->self->behavior){
         case IDLE:  
@@ -112,9 +123,9 @@ struct tile* updateCharacter(struct character* character, struct tile** tiles, A
 /* Realiza a interação do personagem com as tiles,
 retorna uma nova entidade caso seja um bloco especial */
 struct entity* tilesInteract(struct character* character, struct tile** tiles,
-ALLEGRO_SAMPLE** samples, int* score){
+ALLEGRO_SAMPLE** samples, struct entityList* fireballs, int* score){
     struct entity* newEn = NULL;
-    struct tile* t = updateCharacter(character, tiles, samples);
+    struct tile* t = updateCharacter(character, tiles, samples, fireballs);
 
     if(t){
         if(t->content < 1) return NULL; // Se os contéudos de t ja se esgotaram
@@ -127,8 +138,8 @@ ALLEGRO_SAMPLE** samples, int* score){
                 newEn = newEntity(
                     enType, t->x, t->y - t->h, t->w, t->h,
                     !character->self->dir, // Aponta para a direção oposta do personagem
-                    newAnimation(whichSprite),
-                    enType == COIN ? 10 : -1 // Se for moeda, ela tem uma duração limitada
+                    newAnimation(whichSprite, WALK_START, WALK_END, WALK_DURATION),
+                    enType == COIN ? 10 : INFINITE // Se for moeda, ela tem uma duração limitada
                 );
                 
                 if(t->type == COIN_BLOCK)
@@ -211,7 +222,9 @@ ALLEGRO_SAMPLE** samples, int* score){
                         newEn = newEntity(
                             SHELL, current->en->x, current->en->y,
                             current->en->w, current->en->h,
-                            current->en->dir, newAnimation(SHELL_SPRITE), -1
+                            current->en->dir,
+                            newAnimation(SHELL_SPRITE, WALK_START, WALK_END, WALK_DURATION),
+                            INFINITE
                         );
                         insertEntity(entities, newEn);
                     default: // Mata a entidade

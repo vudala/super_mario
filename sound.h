@@ -3,7 +3,7 @@
 
 #include "game.h"
 
-#define SAMPLES_N 8
+#define SAMPLES_N 8 // Quantas samples tem
 typedef enum {
     JUMP_SAMPLE = 0,
     BOUNCE_SAMPLE,
@@ -15,7 +15,16 @@ typedef enum {
     HIT_SAMPLE
 } SamplesIndex;
 
+#define TRACKS_N 2 // Quantas tracks tem
+typedef enum {
+    GAME_TRACK = 0,
+    END_TRACK
+} TracksIndex;
+
+// Carrega as samples
 ALLEGRO_SAMPLE** loadSamples();
-ALLEGRO_AUDIO_STREAM** loadStreams();
+
+// Carrega as tracks
+ALLEGRO_AUDIO_STREAM** loadTracks();
 
 #endif

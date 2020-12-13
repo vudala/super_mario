@@ -14,10 +14,10 @@ void destroyEntity(struct entity* en){
 int whichBehavior(int enType){
     // Se for qualquer uma das outras, nasce pulando
     int behavior = JUMPING;
-    // Se flor moeda ou casco, ela nasce parada
+    // Flor, moeda, casco  ou checkpoint nasce parado
     if(enType == FLOWER || enType == COIN || enType == SHELL || enType == CHECKPOINT)
         behavior = IDLE;
-    // Se for estrela, nasce quicando
+    // Estrela nasce quicando
     else if(enType == STAR || enType == FIREBALL)
         behavior = BOUNCING;
 
@@ -70,13 +70,14 @@ int isDead(struct entity* en){
     return 0;
 }
 
-void addFireball(struct entityList* fireballs, struct entity* en, ALLEGRO_BITMAP*** sprites){
+void addFireball(struct entityList* fireballs, struct entity* en){
     // Onde irá nascer no eixo X
     int whichX = en->dir ? en->x + en->w : en->x - 1;
-    int w = al_get_bitmap_width(sprites[FIREBALL_SPRITE][0]);
-    int h = al_get_bitmap_height(sprites[FIREBALL_SPRITE][0]);
-    struct entity* newFireball = newEntity(FIREBALL, whichX, floor(en->y + (en->w / 2)),
-                                    w, h, en->dir, newAnimation(FIREBALL_SPRITE), 120
+    int whichY =  floor(en->y + (en->w / 2));
+    struct entity* newFireball = newEntity(FIREBALL, whichX, whichY,
+                                    FIREBALL_SIZE, FIREBALL_SIZE, en->dir, 
+                                    newAnimation(FIREBALL_SPRITE, WALK_START, WALK_END, WALK_DURATION),
+                                    FIREBALL_SPAN
                                 );
     insertEntity(fireballs, newFireball);
 }
@@ -88,8 +89,7 @@ int fireballHit(struct entityList* fireballs, struct entity* en){
     while(next != NULL){
         current = next;
         next = current->next;
-        // Se uma fireball bateu em um goomba ou uma turtle
-        // Remove a fireball e retorna true
+        // Se uma fireball bateu em um inimigo emove a fireball e retorna 1
         if(entityCollision(current->en, en) && (en->type == GOOMBA || en->type == TURTLE)){
             removeEntity(current->id, fireballs);
             return 1;
@@ -99,6 +99,7 @@ int fireballHit(struct entityList* fireballs, struct entity* en){
     return 0;
 }
 
+// Movimenta e atualiza as fireballs
 void fireballsUpdate(struct entityList* fireballs, struct tile** tiles){
     struct entityNode* current = NULL;
     struct entityNode* next = fireballs->start; 
@@ -116,6 +117,10 @@ void updateEntity(struct entity* en, struct tile** tiles){
     en->lifeSpan -= 1;
     int whichSpeed = en->type == FIREBALL || en->type == SHELL ? FAST_SPEED : SLOW_SPEED;
     switch(en->behavior){
+        case IDLE:
+            if(!tileDownCollision(en, tiles)) 
+                en->dy += GRAVITY;
+            break;
         case BOUNCING:
             if(en->dir) en->dx = whichSpeed;
             else en->dx = -whichSpeed;
