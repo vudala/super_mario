@@ -36,6 +36,7 @@ void destroyList(struct entityList* l){
 
 int insertEntity(struct entityList* l, struct entity* en){
     struct entityNode* nodo = malloc(sizeof(struct entityNode));
+    mustAllocate(nodo, "nodo");
     if(nodo == NULL) return 0;
     nodo->id = l->idTrack++;
     nodo->en = en;

@@ -85,6 +85,7 @@ int gamePlay(int* score, ALLEGRO_BITMAP** screens, ALLEGRO_SAMPLE** samples, ALL
 
     // Para imprimir a pontuação
     char* aux = malloc(9 * sizeof(char));
+    mustAllocate(aux, "aux string");
 
     bool done = false;
     bool redraw = true;
