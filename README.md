@@ -4,20 +4,20 @@ A C implementation of the famous game Super Mario Bros
 
 --     - Credits -     --
 
-##Engine: Allegro 5
+## Engine: Allegro 5
 
-##Sound FX:
+## Sound FX:
 
 http://github.grumdrig.com/jsfxr/
 https://freesound.org/people/LiamG_SFX/sounds/334234/
 
-##Music:
+## Music:
 
 https://www.youtube.com/watch?v=m-NwlbW6ll8
 https://www.youtube.com/watch?v=XUi0htNm2ho
 https://www.youtube.com/watch?v=7a89J-a4PxA
 
-##Sprites:
+## Sprites:
 
 https://craftpix.net/product/simple-platformer-tileset-pixel-art/
 https://opengameart.org/content/16x16-animated-campfire
