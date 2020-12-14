@@ -3,7 +3,7 @@
 # Compiler and it's settings
 CC = gcc
 CFLAGS = -Wall -std=c99 -g
-LIBS = -lallegro_font -lallegro_image -lallegro_primitives -lallegro -lallegro_audio -lallegro_acodec -lm
+LIBS = -lallegro_font -lallegro_ttf -lallegro_image -lallegro -lallegro_audio -lallegro_acodec -lm
 
 # Inputs and outputs for the compiler
 OBJECTS = main.o game.o level.o entity.o utils.o animation.o entity_list.o character.o sound.o

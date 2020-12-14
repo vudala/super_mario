@@ -230,8 +230,8 @@ void drawTiles(struct tile** tiles, ALLEGRO_BITMAP** sprites, int* offset){
 }
 
 int drawEnd(ALLEGRO_BITMAP** screens, ALLEGRO_SAMPLE** samples, ALLEGRO_AUDIO_STREAM** tracks, int* score){
-    // Começa a soundtrack do fim
-    al_attach_audio_stream_to_mixer(tracks[END_TRACK], al_get_default_mixer());
+    al_rewind_audio_stream(tracks[END_TRACK]); // Reseta a track
+    al_attach_audio_stream_to_mixer(tracks[END_TRACK], al_get_default_mixer()); // Começa a track
 
     bool done = false;
     bool redraw = true;
@@ -287,8 +287,8 @@ int drawEnd(ALLEGRO_BITMAP** screens, ALLEGRO_SAMPLE** samples, ALLEGRO_AUDIO_ST
             sprintf(aux, "Sua pontuação é: %d", *score);
             al_draw_text(font, color, 600, 100, 0 , aux);
             for(int i = 0; i < TOP_SCORE_N; i++){
-                sprintf(aux, "%2d %9d", i+1, scores[i]); 
-                al_draw_text(font, color, 600, 150 + i * 40, 0 , aux);
+                sprintf(aux, "%2d. %12d", i+1, scores[i]); 
+                al_draw_text(font, color, 600, 150 + i * 35, 0 , aux);
             }
 
             al_flip_display();

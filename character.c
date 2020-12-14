@@ -17,7 +17,7 @@ struct character* newCharacter(struct entity* en){
 };
 
 void move(struct entity* en, int xspeed, int direction){
-    en->dir = direction ? RIGHT : LEFT;
+    en->dir = direction;
     en->dx = direction ? xspeed : -xspeed;
 }
 
@@ -123,7 +123,8 @@ ALLEGRO_SAMPLE** samples, ALLEGRO_AUDIO_STREAM** tracks){
     }
     
     character->self->y += character->self->dy;
-    character->self->x += character->self->dx;
+    // Se estiver sob efeito da estrela corre mais rapido
+    character->self->x += character->star ? 1.5*character->self->dx : character->self->dx;
 
     return rValue;
 }
@@ -186,7 +187,7 @@ ALLEGRO_AUDIO_STREAM** tracks, int* score){
                 character->power = FLOWER_POWER;
                 character->self->anim->sprite = CHAR_FLOWER_SPRITE;
                 character->self->behavior = JUMPING;
-                al_play_sample(samples[POWERUP_SAMPLE], 1.0, 0.0, 1.0, ALLEGRO_PLAYMODE_ONCE, NULL);
+                al_play_sample(samples[POWERUP_SAMPLE], 1.0, 1.0, 1.0, ALLEGRO_PLAYMODE_ONCE, NULL);
             }
             else
                 *score += BUFF_SCORE;
@@ -194,7 +195,7 @@ ALLEGRO_AUDIO_STREAM** tracks, int* score){
         case STAR_POWER:
             character->invincibility = INVINCIBILTY;
             character->star = 1;
-            al_play_sample(samples[POWERUP_SAMPLE], 1.0, 0.0, 1.0, ALLEGRO_PLAYMODE_ONCE, NULL);
+            al_play_sample(samples[POWERUP_SAMPLE], 1.0, 1.0, 1.0, ALLEGRO_PLAYMODE_ONCE, NULL);
             al_detach_audio_stream(tracks[GAME_TRACK]);
             al_attach_audio_stream_to_mixer(tracks[STAR_TRACK], al_get_default_mixer());
             break;
@@ -205,7 +206,7 @@ ALLEGRO_AUDIO_STREAM** tracks, int* score){
             character->self->h = SMALL_HEIGHT;
             character->self->anim->sprite = SMALL_CHAR_SPRITE;
             character->self->behavior = JUMPING;
-            al_play_sample(samples[UNPOWER_SAMPLE], 1.0, 0.0, 1.0, ALLEGRO_PLAYMODE_ONCE, NULL);
+            al_play_sample(samples[UNPOWER_SAMPLE], 1.0, 1.0, 1.0, ALLEGRO_PLAYMODE_ONCE, NULL);
             break;
     }
 }

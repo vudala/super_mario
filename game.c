@@ -12,13 +12,15 @@
 #include <stdio.h>
 
 void gameInit(){
-    // Inicia todas as estruturas do Allegro
+    // Inicia as estruturas principais do Allegro
     mustInit(al_init(), "allegro");
     mustInit(al_install_keyboard(), "keyboard");
     mustInit(al_init_image_addon(), "image addon");
-    mustInit(al_install_audio(), "audio");
-    mustInit(al_init_acodec_addon(), "audio codecs");
-    mustInit(al_reserve_samples(16), "reserve samples");
+    mustInit(al_install_audio(), "audio addon");
+    mustInit(al_init_acodec_addon(), "audio codecs addon");
+    mustInit(al_reserve_samples(16), "reserve samples addon");
+    mustInit(al_init_font_addon(), "font addon");
+    mustInit(al_init_ttf_addon(), "font addon");
 
     srand((unsigned) time(NULL));
 
@@ -31,7 +33,7 @@ void gameInit(){
     disp = al_create_display(VIRTUAL_WIDTH, VIRTUAL_HEIGHT);
     mustInit(disp, "display");
 
-    font = al_create_builtin_font();
+    font = al_load_font("resources/database/Pixellari.ttf", 30, 0);
     mustInit(font, "font");
 
     al_register_event_source(queue, al_get_keyboard_event_source());
@@ -77,8 +79,12 @@ int gamePlay(int* score, ALLEGRO_BITMAP** screens, ALLEGRO_SAMPLE** samples, ALL
             INFINITE
         )
     );
-        
-    al_attach_audio_stream_to_mixer(tracks[GAME_TRACK], al_get_default_mixer());
+
+    al_rewind_audio_stream(tracks[GAME_TRACK]); // Reseta a track  
+    al_attach_audio_stream_to_mixer(tracks[GAME_TRACK], al_get_default_mixer()); // Começa a track
+
+    // Para imprimir a pontuação
+    char* aux = malloc(9 * sizeof(char));
 
     bool done = false;
     bool redraw = true;
@@ -99,6 +105,7 @@ int gamePlay(int* score, ALLEGRO_BITMAP** screens, ALLEGRO_SAMPLE** samples, ALL
                 // Se colidiu com outra entidade inimiga sem matá-la, termina o jogo
                 if(entitiesInteract(character, tiles, entities, fireballs, samples, tracks, score)){
                     al_detach_audio_stream(tracks[GAME_TRACK]); // Para a música
+                    al_detach_audio_stream(tracks[STAR_TRACK]); // Para a música
                     sleep(2); // Espera um pouco
                     newState = drawEnd(screens, samples, tracks, score);
                     done = true;
@@ -156,6 +163,10 @@ int gamePlay(int* score, ALLEGRO_BITMAP** screens, ALLEGRO_SAMPLE** samples, ALL
                 color = al_map_rgb(rand() % RGB_MAX, rand() % RGB_MAX, rand() % RGB_MAX);
                 
             drawEntity(character->self, &offset, entitySprites, color);
+
+            // Desenha o score no canto da tela em vermelho
+            sprintf(aux, "%d", *score);
+            al_draw_text(font, al_map_rgb(200, 60, 0), 20, 20, 0, aux);
             
             al_flip_display();
             redraw = false;
@@ -188,6 +199,9 @@ int gamePlay(int* score, ALLEGRO_BITMAP** screens, ALLEGRO_SAMPLE** samples, ALL
     }
     free(entitySprites);    
     entitySprites = NULL;
+
+    free(aux);
+    aux = NULL;
             
     *score = 0;
 
