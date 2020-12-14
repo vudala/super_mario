@@ -2,7 +2,7 @@
 A C implementation of the famous game Super Mario Bros
 
 
-## --     - Credits -     --
+## Credits
 
 ### Engine:
 
