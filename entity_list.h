@@ -1,5 +1,3 @@
-// GRR20195689 Eduardo Vudala Senoski
-
 #ifndef ENTITYLIST_INCLUDED
 #define ENTITYLIST_INCLUDED
 

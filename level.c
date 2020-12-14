@@ -1,5 +1,3 @@
-// GRR20195689 Eduardo Vudala Senoski
-
 #include "level.h"
 #include "utils.h"
 #include "animation.h"

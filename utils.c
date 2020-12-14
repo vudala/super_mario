@@ -1,5 +1,3 @@
-// GRR20195689 Eduardo Vudala Senoski
-
 #include "utils.h"
 
 #include <stdlib.h>

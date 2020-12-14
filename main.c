@@ -1,5 +1,3 @@
-// GRR20195689 Eduardo Vudala Senoski
-
 #include "game.h"
 #include "sound.h"
 #include "animation.h"

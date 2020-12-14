@@ -1,5 +1,3 @@
-// GRR20195689 Eduardo Vudala Senoski
-
 #include "game.h"
 #include "level.h"
 #include "entity.h"

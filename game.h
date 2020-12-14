@@ -1,5 +1,3 @@
-// GRR20195689 Eduardo Vudala Senoski
-
 #ifndef GAME_INCLUDED
 #define GAME_INCLUDED
 

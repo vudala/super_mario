@@ -1,5 +1,3 @@
-// GRR20195689 Eduardo Vudala Senoski
-
 #include "entity_list.h"
 #include "entity.h"
 #include "entity_list.h"

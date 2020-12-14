@@ -1,5 +1,3 @@
-// GRR20195689 Eduardo Vudala Senoski
-
 #ifndef ANIMATION_INCLUDED
 #define ANIMATION_INCLUDED
 

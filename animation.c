@@ -1,5 +1,3 @@
-// GRR20195689 Eduardo Vudala Senoski
-
 #include "animation.h"
 #include "entity.h"
 #include "utils.h"

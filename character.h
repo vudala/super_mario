@@ -1,5 +1,3 @@
-// GRR20195689 Eduardo Vudala Senoski
-
 #ifndef CHARACTER_INCLUDED
 #define CHARACTER_INCLUDED
 

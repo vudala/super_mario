@@ -1,5 +1,3 @@
-// GRR20195689 Eduardo Vudala Senoski
-
 #include "character.h"
 #include "utils.h"
 #include "sound.h"

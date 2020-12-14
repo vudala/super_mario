@@ -1,5 +1,3 @@
-// GRR20195689 Eduardo Vudala Senoski
-
 #ifndef LEVEL_INCLUDED
 #define LEVEL_INCLUDED
 

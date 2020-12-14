@@ -1,5 +1,3 @@
-// GRR20195689 Eduardo Vudala Senoski
-
 #ifndef UTILS_INCLUDED
 #define UTILS_INCLUDED
 

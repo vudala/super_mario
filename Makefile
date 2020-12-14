@@ -1,5 +1,3 @@
-# GRR20195689 Eduardo Vudala Senoski
-
 # Compiler and it's settings
 CC = gcc
 CFLAGS = -Wall -std=c99 -g
