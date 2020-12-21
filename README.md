@@ -4,7 +4,7 @@ A C implementation of the famous game Super Mario Bros
 
 ## Credits
 
-### Engine:
+### Graphic Engine:
 
 - Allegro 5
 
@@ -29,5 +29,5 @@ A C implementation of the famous game Super Mario Bros
 - https://www.spriters-resource.com/fullview/27520/
 - https://www.vectorstock.com/royalty-free-vector/pixel-art-style-set-different-texture-vector-23823354
 
-Some sprites were taken from the original game and edited to to game theme.
+Some sprites were taken from the original game and edited to the game theme.
 The other animations and sprites were made by me.
