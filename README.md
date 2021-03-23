@@ -4,6 +4,7 @@ A C implementation of the famous game Super Mario Bros
 
 ## Requirements:
 gcc 7.4.0
+
 allegro5 (https://github.com/liballeg/allegro_wiki/wiki/Quickstart)
 
 ## Credits
