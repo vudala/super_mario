@@ -1,11 +1,14 @@
 # super_mario
 A C implementation of the famous game Super Mario Bros
-(gcc 7.4.0)
 
+
+## Requirements:
+gcc 7.4.0
+allegro5 (https://github.com/liballeg/allegro_wiki/wiki/Quickstart)
 
 ## Credits
 
-### Graphic Engine:
+### Graphic & Sound engine:
 
 - Allegro 5
 
