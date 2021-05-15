@@ -1,6 +1,5 @@
 # super_mario
-A C implementation of the famous game Super Mario Bros
-
+A simple implementation wrote in C of the famous game Super Mario Bros, some southern seasoning was added to make it special :)
 
 ## Requirements:
 gcc 7.4.0
