@@ -14,12 +14,12 @@
 #define KEY_SEEN     1
 #define KEY_RELEASED 2
 
-ALLEGRO_TIMER* timer;
-ALLEGRO_EVENT_QUEUE* queue;
-ALLEGRO_DISPLAY* disp;
-ALLEGRO_FONT* font;
-ALLEGRO_EVENT event;
-unsigned char key[ALLEGRO_KEY_MAX];
+extern ALLEGRO_TIMER* timer;
+extern ALLEGRO_EVENT_QUEUE* queue;
+extern ALLEGRO_DISPLAY* disp;
+extern ALLEGRO_FONT* font;
+extern ALLEGRO_EVENT event;
+extern unsigned char key[ALLEGRO_KEY_MAX];
 
 typedef enum {
     PLAY = 0,

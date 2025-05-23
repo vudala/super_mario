@@ -2,6 +2,13 @@
 #include "sound.h"
 #include "animation.h"
 
+ALLEGRO_TIMER* timer;
+ALLEGRO_EVENT_QUEUE* queue;
+ALLEGRO_DISPLAY* disp;
+ALLEGRO_FONT* font;
+ALLEGRO_EVENT event;
+unsigned char key[ALLEGRO_KEY_MAX];
+
 int main(){
     gameInit();
     
